@@ -3,6 +3,9 @@ import { AuthProvider } from "./AuthContext";
 import Navbar from "./components/Navbar";
 
 import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Booking from "./pages/Booking";
+
 
 import PrivateRoute from "./route/PrivateRoute";
 import PublicRoute from "./route/PublicRoute";
