@@ -14,7 +14,10 @@ export default function App() {
         <Navbar />
 
         <Routes>
-          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />-
+          <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+
+          <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
