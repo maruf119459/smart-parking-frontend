@@ -21,6 +21,9 @@ export default function App() {
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/forgot" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
 
+          <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+
+          <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
