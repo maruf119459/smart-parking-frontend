@@ -10,6 +10,7 @@ import Booking from "./pages/Booking";
 import PrivateRoute from "./route/PrivateRoute";
 import PublicRoute from "./route/PublicRoute";
 import ForgotPassword from "./pages/ForgotPassword";
+import History from "./pages/History";
 
 export default function App() {
   return (
@@ -20,6 +21,13 @@ export default function App() {
         <Routes>
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/forgot" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+
+
+
+
+          
+          <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
+
 
         </Routes>
       </BrowserRouter>
