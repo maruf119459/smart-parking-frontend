@@ -3,8 +3,6 @@ import { AuthProvider } from "./AuthContext";
 import Navbar from "./components/Navbar";
 
 import Register from "./pages/Register";
-import Login from "./pages/Login";
-import Booking from "./pages/Booking";
 
 
 import PrivateRoute from "./route/PrivateRoute";
@@ -27,6 +25,7 @@ export default function App() {
 
           
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><History /></PrivateRoute>} />
 
 
         </Routes>
