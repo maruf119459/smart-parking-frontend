@@ -10,7 +10,6 @@ export default function Navbar() {
         <>
           <Link to="/login">Login</Link> |{" "}
           <Link to="/register">Create Account</Link> |{" "}
-          <Link to="/qrcodedecode">QR Decode</Link>
         </>
       )}
 

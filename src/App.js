@@ -3,14 +3,13 @@ import { AuthProvider } from "./AuthContext";
 import Navbar from "./components/Navbar";
 
 import Register from "./pages/Register";
-import Login from "./pages/Login";
-import Booking from "./pages/Booking";
 
 
 import PrivateRoute from "./route/PrivateRoute";
 import PublicRoute from "./route/PublicRoute";
 import ForgotPassword from "./pages/ForgotPassword";
 import History from "./pages/History";
+import Profile from "./pages/Profile";
 
 export default function App() {
   return (
@@ -22,6 +21,7 @@ export default function App() {
           <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
           <Route path="/forgot" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
           <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
+          <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
           <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
           <Route path="/booking" element={<PrivateRoute><Booking /></PrivateRoute>} />
         </Routes>
