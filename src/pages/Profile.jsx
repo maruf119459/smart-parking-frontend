@@ -40,7 +40,7 @@ export default function Profile() {
     setStats(res.data);
   };
 
-  // 🔹 Update Name / Phone
+  // Update Name / Phone
   const updateProfile = async () => {
     setError("");
     setSuccess("");
@@ -75,7 +75,7 @@ export default function Profile() {
     }
   };
 
-  // 🔹 Update Password
+  // Update Password
   const updateUserPassword = async () => {
     setError("");
     setSuccess("");

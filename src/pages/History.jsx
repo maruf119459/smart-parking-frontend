@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { socket } from "../socket";
 import { useAuth } from "../AuthContext";
+import { BounceLoader } from "react-spinners"; 
+import loadingImg from "../assets/loading_img.png"; 
 
 export default function History() {
   const { user } = useAuth();
@@ -39,7 +41,23 @@ export default function History() {
     <div style={{ textAlign: "center", marginTop: "10px" }}>
       <h2>Parking History</h2>
 
-      {loading && <p>Loading...</p>}
+      {loading && <div 
+        style={{
+          height: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#fff" 
+        }}
+      >
+        <img 
+          src={loadingImg} 
+          alt="City Parking Logo" 
+          style={{ width: "250px", marginBottom: "20px" }} 
+        />
+        <BounceLoader color="#2c3e50" size={60} />
+      </div>}
 
       {!loading && history.length === 0 && (
         <p>No history found</p>

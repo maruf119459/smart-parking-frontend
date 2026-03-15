@@ -3,6 +3,8 @@ import axios from "axios";
 import { socket } from "../socket";
 import ParkingCard from "../components/ParkingCard";
 import { useAuth } from "../AuthContext";
+import { BounceLoader } from "react-spinners"; 
+import loadingImg from "../assets/loading_img.png"; 
 
 export default function Booking() {
   const { user } = useAuth();
@@ -10,11 +12,13 @@ export default function Booking() {
   const [sessions, setSessions] = useState([]);
   const [vehicleType, setVehicleType] = useState("default");
   const [vehicleTypes, setVehicleTypes] = useState([]);
-  const [slotAvailability, setSlotAvailability] = useState({}); // 🔥 key change
+  const [slotAvailability, setSlotAvailability] = useState({}); 
+  const [loading, setLoading] = useState(true);
+
 
   // Load slot availability + user sessions
   const loadData = async () => {
-    // 🔹 Load all free slots (dynamic)
+    // Load all free slots (dynamic)
     const slotsRes = await axios.get(
       "http://localhost:5000/api/slots/available"
     );
@@ -23,14 +27,12 @@ export default function Booking() {
     slotsRes.data.forEach(item => {
       availabilityMap[item.vehicleType.toLowerCase()] = item.available;
     });
-
     setSlotAvailability(availabilityMap);
 
-    // 🔹 Active parking sessions
+    // Active parking sessions
     const parkingRes = await axios.get(
       `http://localhost:5000/api/parking/user-current-parking?uid=${user.uid}`
     );
-
     setSessions(parkingRes.data);
   };
 
@@ -39,8 +41,6 @@ export default function Booking() {
     const res = await axios.get(
       "http://localhost:5000/api/vehicle-types"
     );
-
-    // normalize to lowercase for consistency
     setVehicleTypes(res.data.map(v => v.toLowerCase()));
   };
 
@@ -49,7 +49,7 @@ export default function Booking() {
 
     loadData();
     loadVehicleTypes();
-
+    
     socket.on("db_update", loadData);
     return () => socket.off("db_update");
   }, [user]);
@@ -67,7 +67,7 @@ export default function Booking() {
     });
   };
 
-  // 🔥 Fully dynamic disable logic
+  // Dynamic disable logic
   const isBookDisabled =
     vehicleType === "default" ||
     !slotAvailability[vehicleType] ||
@@ -77,7 +77,7 @@ export default function Booking() {
     <div style={{ textAlign: "center", marginTop: "10px" }}>
       <h2><b>Available Slots</b></h2>
 
-      {/* 🔹 Dynamic slot display */}
+      {/* Dynamic slot display */}
       {vehicleTypes.map(type => (
         <p key={type}>
           {type.toUpperCase()} : {slotAvailability[type] || 0}
