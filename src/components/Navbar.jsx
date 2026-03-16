@@ -21,6 +21,7 @@ export default function Navbar() {
           ) : (
             <>
               <Link className="nav-link-custom" to="/booking">Booking</Link>
+              <Link className="nav-link-custom" to="/history">History</Link>
               <Link className="nav-link-custom" to="/profile">Profile</Link>
               <button className="nav-link-custom border-0 bg-transparent" onClick={logout}>
                 Logout

@@ -56,3 +56,20 @@ code {
 .nav-link-custom:hover {
   background-color: #e9ecef;
 }
+
+/* Remove default browser eye icon */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+/* Custom alignment for terms box */
+.terms-scroll-box {
+  height: 450px; /* Increased height */
+  overflow-y: auto;
+  text-align: justify; /* Justify text */
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+}
