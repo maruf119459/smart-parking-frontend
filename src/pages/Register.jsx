@@ -81,7 +81,7 @@ export default function Register() {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        agreedToTerms: agreed // Saving agreement status
+        agreedToTerms: agreed
       });
 
       toast.success("Registration successful! Please check your email for verification.");
