@@ -11,15 +11,17 @@ export default function Navbar() {
         <Link className="navbar-brand" to="/">
           <img src={logo} alt="Logo" height="35" />
         </Link>
-        
+
         <div className="d-flex align-items-center gap-1">
           {!user ? (
             <>
+              <Link className="nav-link-custom" to="/">Home</Link>
               <Link className="nav-link-custom" to="/login">Login</Link>
               <Link className="nav-link-custom" to="/register">Sign up</Link>
             </>
           ) : (
             <>
+              <Link className="nav-link-custom" to="/">Home</Link>
               <Link className="nav-link-custom" to="/booking">Booking</Link>
               <Link className="nav-link-custom" to="/history">History</Link>
               <Link className="nav-link-custom" to="/profile">Profile</Link>
