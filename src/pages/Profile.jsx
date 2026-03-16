@@ -41,6 +41,7 @@ export default function Profile() {
         axios.get(`http://localhost:5000/api/users/${user.uid}`),
         axios.get(`http://localhost:5000/api/parking/stats/${user.uid}`)
       ]);
+      console.log("Stats Data:", statRes.data);
       setProfile(profRes.data);
       setName(profRes.data.name);
       setPhone(profRes.data.phone);
@@ -133,6 +134,7 @@ export default function Profile() {
         <div className="col-md-8 col-lg-6">
           <div className="text-center mb-4">
             <h2 className="fw-bold italic" style={{ color: '#4a4a8a', fontStyle: 'italic' }}>My Profile</h2>
+            <p className="small fw-bold" style={{ color: '#070708' }}>Your Unique ID: {profile.uid}</p>
             <img src={logo} alt="Logo" className="my-3" style={{ width: "120px" }} />
           </div>
 
@@ -150,8 +152,8 @@ export default function Profile() {
                   <span className="small text-muted">Running</span>
                 </div>
                 <div className="col-4">
-                  <h4 className="fw-bold text-danger mb-0">{stats.entranceError || 0}</h4>
-                  <span className="small text-muted">Errors</span>
+                  <h4 className="fw-bold text-danger mb-0">{stats.canceled || 0}</h4>
+                  <span className="small text-muted">Canceled</span>
                 </div>
               </div>
             </div>
