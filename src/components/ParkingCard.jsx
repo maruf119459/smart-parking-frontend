@@ -22,12 +22,12 @@ export default function ParkingCard({ data }) {
       .get("http://localhost:5000/api/charge-control", {
         params: { vehicleType: data.vehicleType }
       })
-      .then(res => setRate(res.data.chargePerMinutes))
+      .then(res => setRate(res.data.chargingRate))
       .catch(console.error);
   }, [data?.vehicleType]);
 
   /* ✅ EARLY RETURN MUST BE HERE (after hooks) */
-  if (["entance_error", "completed"].includes(data.status)) {
+  if (["canceled", "completed"].includes(data.status)) {
     return null;
   }
 
@@ -142,7 +142,7 @@ const calculateAmount = async () => {
         </div>
       )}
 
-      {data.status === "inital" && (
+      {data.status === "request_booking" && (
         <button onClick={generateEntranceQR}>Entrance QR</button>
       )}
 
