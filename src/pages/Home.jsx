@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { socket } from "../socket";
-import { Sun } from "lucide-react";
+import { Sun,Moon } from "lucide-react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -47,6 +47,7 @@ export default function Home() {
     const [charges, setCharges] = useState([]);
     const [ongoingParking, setOngoingParking] = useState([]);
     const [rules, setRules] = useState([]);
+const[isDay, setIsDay] = useState(true);
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -57,6 +58,7 @@ export default function Home() {
 
         axios.get("http://localhost:5000/api/vehicle-types-and-charges").then(res => setCharges(res.data));
         axios.get("http://localhost:5000/api/rules-and-regulations").then(res => setRules(res.data));
+        setIsDay(currentTime.getHours() >= 6 && currentTime.getHours() < 18);
 
         return () => clearInterval(timer);
     }, []);
@@ -120,7 +122,7 @@ export default function Home() {
 
     return (
         <div className="container py-4" style={{ maxWidth: "900px" }}>
-            <ToastContainer position="top-right" autoClose={3000} />
+            <ToastContainer position="top-center" autoClose={3000} />
             
             {/* Banner Section */}
             <div className="position-relative text-white rounded-4 overflow-hidden mb-4 shadow-lg" 
@@ -131,7 +133,14 @@ export default function Home() {
                     {weather && (
                         <div className="d-flex align-items-center gap-2">
                             <span className="fs-3 fw-bold">{weather.temperature}°C</span>
-                            <Sun size={32} />
+                            <span>
+                                {isDay ? (
+                        <Sun size={32} color="orange" />
+                    ) : (
+                        <Moon size={32} color="gray" />
+                    )}
+
+                            </span>
                         </div>
                     )}
                 </div>
