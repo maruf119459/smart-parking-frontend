@@ -11,6 +11,7 @@ import PublicRoute from "./route/PublicRoute";
 import ForgotPassword from "./pages/ForgotPassword";
 import History from "./pages/History";
 import Profile from "./pages/Profile";
+import Home from "./pages/Home";
 
 // Import your CSS file where you will put the styles below
 import "./App.css"; 
@@ -28,6 +29,7 @@ export default function App() {
             <Routes>
               <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
               <Route path="/forgot" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+              <Route path="/" element={<Home />} />
               <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
               <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />

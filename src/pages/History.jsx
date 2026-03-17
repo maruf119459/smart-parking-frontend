@@ -162,6 +162,10 @@ export default function History() {
               <AnimatePresence>
                 {expandedId === h._id && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-3 pt-3 border-top">
+                      <div className="d-flex justify-content-between fw-bold pb-2">
+                      <span>Parking Rate</span>
+                      <span className="text-primary">{h.parkingRate}</span>
+                    </div>
                     {payments.map((p, idx) => (
                       <div key={idx} className="mb-3 small pb-2 border-bottom border-light">
                         <div className="text-muted">Transaction ID: {p.tran_id}</div>
@@ -222,6 +226,7 @@ function InvoiceTemplate({ id, h, payments, total, user }) {
           ["Customer Phone", h?.phone || "N/A"],
           ["Email Address", user?.email || h.email || "N/A"],
           ["Vehicle Type", h.vehicleType],
+          ["Parking Rate", h.parkingRate],
           ["Slot Number", h.slotNumber],
           ["Booking Time", formatDate(h.booking_time)],
           ["Entry Time", formatDate(h.entryTime)],
