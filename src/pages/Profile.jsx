@@ -135,7 +135,6 @@ export default function Profile() {
           <div className="text-center mb-4">
             <h2 className="fw-bold italic" style={{ color: '#4a4a8a', fontStyle: 'italic' }}>My Profile</h2>
             <p className="small fw-bold" style={{ color: '#070708' }}>Your Unique ID: {profile.uid}</p>
-            <img src={logo} alt="Logo" className="my-3" style={{ width: "120px" }} />
           </div>
 
           {/* Stats Section */}
