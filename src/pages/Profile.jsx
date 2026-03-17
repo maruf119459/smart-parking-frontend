@@ -1,196 +1,240 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { auth } from "../firebase";
-import { updateEmail, updatePassword } from "firebase/auth";
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { toast, ToastContainer } from "react-toastify";
+import logo from "../assets/loading_img.png";
+import { BounceLoader } from "react-spinners";
+import { Eye, EyeOff, User,CheckCircle2, Phone, Lock, ShieldCheck } from "lucide-react";
 
 export default function Profile() {
   const user = auth.currentUser;
-  const uid = user.uid;
 
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState({});
   const [stats, setStats] = useState({});
 
+  // Profile Form States
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-
   const [updateNameChecked, setUpdateNameChecked] = useState(false);
   const [updatePhoneChecked, setUpdatePhoneChecked] = useState(false);
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  // Password Form States
+  const [oldPassword, setOldPassword] = useState(" ");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  
+  // UI States
+  const [showOldPass, setShowOldPass] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  const [showConfirmPass, setShowConfirmPass] = useState(false);
+  const [passStrength, setPassStrength] = useState(0);
 
   useEffect(() => {
-    loadProfile();
-    loadStats();
-  }, []);
+    if (user) loadData();
+  }, [user]);
 
-  const loadProfile = async () => {
-    const res = await axios.get(`http://localhost:5000/api/users/${uid}`);
-    setProfile(res.data);
-    setName(res.data.name);
-    setPhone(res.data.phone);
-  };
-
-  const loadStats = async () => {
-    const res = await axios.get(
-      `http://localhost:5000/api/parking/stats/${uid}`
-    );
-    setStats(res.data);
-  };
-
-  // 🔹 Update Name / Phone
-  const updateProfile = async () => {
-    setError("");
-    setSuccess("");
-
-    const updates = {};
-
-    if (updateNameChecked) {
-      if (!name) return setError("Name cannot be empty");
-      updates.name = name;
+  const loadData = async () => {
+    try {
+      const [profRes, statRes] = await Promise.all([
+        axios.get(`http://localhost:5000/api/users/${user.uid}`),
+        axios.get(`http://localhost:5000/api/parking/stats/${user.uid}`)
+      ]);
+      console.log("Stats Data:", statRes.data);
+      setProfile(profRes.data);
+      setName(profRes.data.name);
+      setPhone(profRes.data.phone);
+      setStats(statRes.data);
+    } catch (err) {
+      toast.error("Failed to load profile data");
+    } finally {
+      setLoading(false);
     }
+  };
 
+  // Password Strength Logic
+  useEffect(() => {
+    let strength = 0;
+    if (newPassword.length >= 8) strength += 25;
+    if (/[a-z]/.test(newPassword) && /[A-Z]/.test(newPassword)) strength += 25;
+    if (/[0-9]/.test(newPassword)) strength += 25;
+    if (/[^A-Za-z0-9]/.test(newPassword)) strength += 25;
+    setPassStrength(strength);
+  }, [newPassword]);
+
+  const getStrengthText = () => {
+    if (passStrength === 0) return "";
+    if (passStrength <= 25) return "Weak (Use 8+ chars)";
+    if (passStrength <= 50) return "Fair (Add Uppercase)";
+    if (passStrength <= 75) return "Good (Add Numbers)";
+    return "Strong Password";
+  };
+
+  const handleUpdateProfile = async () => {
+    const updates = {};
+    if (updateNameChecked) updates.name = name;
     if (updatePhoneChecked) {
-      const phoneRegex = /^01\d{9}$/;
-      if (!phoneRegex.test(phone))
-        return setError("Invalid phone number format");
+      if (!/^01\d{9}$/.test(phone)) return toast.error("Invalid phone format");
       updates.phone = phone;
     }
-
-    if (Object.keys(updates).length === 0)
-      return setError("Select at least one field to update");
+    if (Object.keys(updates).length === 0) return toast.warn("Nothing to update");
 
     try {
-      await axios.patch("http://localhost:5000/api/users/update-profile", {
-        uid,
-        ...updates,
-      });
-
-      setSuccess("Profile updated successfully");
-      loadProfile();
+      await axios.patch("http://localhost:5000/api/users/update-profile", { uid: user.uid, ...updates });
+      toast.success("Profile updated!");
+      loadData();
+      setUpdateNameChecked(false);
+      setUpdatePhoneChecked(false);
     } catch (err) {
-      setError(err.message);
+      toast.error("Update failed");
     }
   };
 
-  // 🔹 Update Password
-  const updateUserPassword = async () => {
-    setError("");
-    setSuccess("");
-
-    if (!newPassword || !confirmPassword)
-      return setError("Password fields cannot be empty");
-
-    if (newPassword !== confirmPassword)
-      return setError("Passwords do not match");
-
-    if (newPassword.length < 6)
-      return setError("Password must be at least 6 characters");
+  const handleUpdatePassword = async () => {
+    if (!oldPassword) return toast.error("Please enter your current password");
+    if (passStrength < 100) return toast.error("New password is not strong enough");
+    if (newPassword !== confirmPassword) return toast.error("Passwords do not match");
 
     try {
+      // Step 1: Re-authenticate the user
+      const credential = EmailAuthProvider.credential(user.email, oldPassword);
+      await reauthenticateWithCredential(user, credential);
+
+      // Step 2: Update the password
       await updatePassword(user, newPassword);
-      setSuccess("Password updated successfully");
+      
+      toast.success("Password changed successfully!");
+      setOldPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      if (err.code === "auth/weak-password") {
-        setError("Password must be at least 6 characters");
+      if (err.code === "auth/wrong-password") {
+        toast.error("Incorrect old password");
       } else {
-        setError(err.message);
+        toast.error(err.message);
       }
     }
   };
 
+  if (loading) {
+    return (
+      <div className="d-flex flex-column align-items-center justify-content-center" style={{ height: "80vh" }}>
+        <img src={logo} alt="Logo" style={{ width: "220px", marginBottom: "20px" }} />
+        <BounceLoader color="#6199ff" size={50} />
+      </div>
+    );
+  }
+
   return (
-    <div style={{ width: "60%", margin: "auto" }}>
-      <h2>My Profile</h2>
+    <div className="container py-5">
+      <ToastContainer position="top-center" autoClose={3000} />
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
+      <div className="row justify-content-center">
+        <div className="col-md-8 col-lg-6">
+          <div className="text-center mb-4">
+            <h2 className="fw-bold italic" style={{ color: '#4a4a8a', fontStyle: 'italic' }}>My Profile</h2>
+            <p className="small fw-bold" style={{ color: '#070708' }}>Your Unique ID: {profile.uid}</p>
+            <img src={logo} alt="Logo" className="my-3" style={{ width: "120px" }} />
+          </div>
 
-      <p><b>User ID:</b> {uid}</p>
-      <p><b>Name:</b> {profile.name}</p>
-      <p><b>Email:</b> {profile.email} <b>Email can not change.</b></p>
-      <p><b>Phone:</b> {profile.phone}</p>
+          {/* Stats Section */}
+          <div className="card border-0 shadow-sm mb-4" style={{ borderRadius: '20px', background: '#f8faff' }}>
+            <div className="card-body p-4 text-center">
+              <h6 className="text-muted small fw-bold mb-3 text-uppercase">Parking Summary</h6>
+              <div className="row">
+                <div className="col-4 border-end">
+                  <h4 className="fw-bold text-success mb-0">{stats.completed || 0}</h4>
+                  <span className="small text-muted">Completed</span>
+                </div>
+                <div className="col-4 border-end">
+                  <h4 className="fw-bold text-primary mb-0">{stats.running || 0}</h4>
+                  <span className="small text-muted">Running</span>
+                </div>
+                <div className="col-4">
+                  <h4 className="fw-bold text-danger mb-0">{stats.canceled || 0}</h4>
+                  <span className="small text-muted">Canceled</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-      <hr />
+          {/* Account Settings Card */}
+          <div className="card border-0 shadow-sm mb-4" style={{ borderRadius: '20px' }}>
+            <div className="card-body p-4">
+              <label className="form-label fw-bold small text-muted text-uppercase mb-3">General Settings</label>
+              
+              <div className="input-group mb-3 border rounded-3 shadow-sm bg-light overflow-hidden">
+                <span className="input-group-text bg-transparent border-0"><User size={18} className="text-primary" /></span>
+                <input className="form-control border-0 bg-transparent py-2" value={name} onChange={(e) => setName(e.target.value)} disabled={!updateNameChecked} placeholder="Full Name" />
+                <div className="input-group-text bg-transparent border-0">
+                  <input type="checkbox" checked={updateNameChecked} onChange={() => setUpdateNameChecked(!updateNameChecked)} />
+                </div>
+              </div>
 
-      <h3>Update Name / Phone</h3>
+              <div className="input-group mb-4 border rounded-3 shadow-sm bg-light overflow-hidden">
+                <span className="input-group-text bg-transparent border-0"><Phone size={18} className="text-primary" /></span>
+                <input className="form-control border-0 bg-transparent py-2" value={phone} onChange={(e) => setPhone(e.target.value)} disabled={!updatePhoneChecked} placeholder="Phone Number" />
+                <div className="input-group-text bg-transparent border-0">
+                  <input type="checkbox" checked={updatePhoneChecked} onChange={() => setUpdatePhoneChecked(!updatePhoneChecked)} />
+                </div>
+              </div>
 
-      <label>
-        <input
-          type="checkbox"
-          checked={updateNameChecked}
-          onChange={() => setUpdateNameChecked(!updateNameChecked)}
-        />
-        Update Name
-      </label>
+              <button className="btn btn-primary w-100 py-3 fw-bold mb-4" style={{ borderRadius: '12px', backgroundColor: '#6199ff', border: 'none' }} onClick={handleUpdateProfile} disabled={!updateNameChecked && !updatePhoneChecked}>
+                Save Profile Changes
+              </button>
 
-      <input
-        placeholder="Name"
-        value={name}
-        disabled={!updateNameChecked}
-        onChange={(e) => setName(e.target.value)}
-      />
+              <hr className="my-4 opacity-25" />
 
-      <br />
+              {/* Password Section */}
+              <label className="form-label fw-bold small text-muted text-uppercase mb-3">Security & Password</label>
+              
+              {/* Old Password */}
+              <div className="position-relative mb-3">
+                <span className="position-absolute start-0 top-50 translate-middle-y ms-3 text-muted"><ShieldCheck size={18} /></span>
+                <input type={showOldPass ? "text" : "password"} className="form-control form-control-lg border shadow-sm ps-5" placeholder="Current Password" value={oldPassword} onChange={(e) => setOldPassword(e.target.value)} />
+                <span className="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" onClick={() => setShowOldPass(!showOldPass)}>
+                  {showOldPass ? <EyeOff size={20} /> : <Eye size={20} />}
+                </span>
+              </div>
 
-      <label>
-        <input
-          type="checkbox"
-          checked={updatePhoneChecked}
-          onChange={() => setUpdatePhoneChecked(!updatePhoneChecked)}
-        />
-        Update Phone
-      </label>
+              {/* New Password */}
+              <div className="d-flex justify-content-between align-items-center mb-1 px-1">
+                <span className="small fw-bold" style={{ fontSize: '11px', color: passStrength < 100 ? '#ff4d4d' : '#00cc66' }}>{getStrengthText()}</span>
+                <div style={{ width: "60px", height: "5px", backgroundColor: "#eee", borderRadius: "10px" }}>
+                  <div style={{ width: `${passStrength}%`, height: "100%", borderRadius: "10px", transition: "0.4s", backgroundColor: passStrength < 50 ? "#ff4d4d" : passStrength < 100 ? "#ffcc00" : "#00cc66" }}></div>
+                </div>
+              </div>
 
-      <input
-        placeholder="Phone"
-        value={phone}
-        disabled={!updatePhoneChecked}
-        onChange={(e) => setPhone(e.target.value)}
-      />
+              <div className="position-relative mb-3">
+                <span className="position-absolute start-0 top-50 translate-middle-y ms-3 text-muted"><Lock size={18} /></span>
+                <input type={showPass ? "text" : "password"} className="form-control form-control-lg border shadow-sm ps-5" placeholder="New Password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                <span className="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" onClick={() => setShowPass(!showPass)}>
+                  {showPass ? <EyeOff size={20} /> : <Eye size={20} />}
+                </span>
+              </div>
 
-      <button onClick={updateProfile}>Update Profile</button>
+              {/* Confirm Password */}
+              <div className="position-relative mb-4">
+                <span className="position-absolute start-0 top-50 translate-middle-y ms-3 text-muted"><CheckCircle2 size={18} /></span>
+                <input type={showConfirmPass ? "text" : "password"} className="form-control form-control-lg border shadow-sm ps-5" placeholder="Confirm New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                <span className="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" onClick={() => setShowConfirmPass(!showConfirmPass)}>
+                  {showConfirmPass ? <EyeOff size={20} /> : <Eye size={20} />}
+                </span>
+              </div>
 
-      <hr />
+              <button className="btn btn-dark w-100 py-3 fw-bold" style={{ borderRadius: '12px' }} onClick={handleUpdatePassword} disabled={passStrength < 100 || !oldPassword}>
+                Update Password
+              </button>
+            </div>
+          </div>
 
-      <h3>Update Password</h3>
-      <input
-        type="password"
-        placeholder="New Password"
-        value={newPassword}
-        onChange={(e) => setNewPassword(e.target.value)}
-      />
-      <input
-        type="password"
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChange={(e) => setConfirmPassword(e.target.value)}
-      />
-      <button onClick={updateUserPassword}>Update Password</button>
-
-      <hr />
-
-      <h3>Parking Summary</h3>
-      <table border="1" width="100%">
-        <thead>
-          <tr>
-            <th>Completed</th>
-            <th>Running</th>
-            <th>Entrance Error</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>{stats.completed}</td>
-            <td>{stats.running}</td>
-            <td>{stats.entranceError}</td>
-          </tr>
-        </tbody>
-      </table>
+          <div className="text-center mt-3">
+            <p className="text-muted small mb-1">Signed in as</p>
+            <p className="fw-bold">{user.email}</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

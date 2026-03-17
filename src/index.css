@@ -11,3 +11,65 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+/* Base background setup */
+.app-container {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  justify-content: center;
+  background-color: #f8f9fa; 
+}
+
+.app-container::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background-image: url('./assets/bg.png');
+  background-repeat: repeat;
+  background-size: 278px 262px;
+  opacity: 0.4;
+  z-index: 0;
+}
+
+/* Main Content*/
+.main-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 800px; 
+  background-color: #ffffff;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  min-height: 100vh;
+}
+
+/* Pill Hover for Navbar */
+.nav-link-custom {
+  text-decoration: none;
+  color: #333;
+  padding: 6px 18px;
+  border-radius: 50px;
+  transition: 0.3s;
+  font-weight: 500;
+}
+
+.nav-link-custom:hover {
+  background-color: #e9ecef;
+}
+
+/* Remove default browser eye icon */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
+/* Custom alignment for terms box */
+.terms-scroll-box {
+  height: 450px; /* Increased height */
+  overflow-y: auto;
+  text-align: justify; /* Justify text */
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 20px;
+}
