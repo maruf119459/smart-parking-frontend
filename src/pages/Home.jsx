@@ -2,12 +2,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { socket } from "../socket";
-import { Sun,Moon } from "lucide-react";
-import { toast, ToastContainer } from "react-toastify";
+import { Sun, Moon, Clock, AlertTriangle, CreditCard } from "lucide-react";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { BounceLoader } from "react-spinners";
+import loadingImg from "../assets/loading_img.png";
 
 // Asset Imports
-import bannerImg from "../assets/banner.jpg"; 
+import bannerImg from "../assets/banner.jpg";
 import busTopViewIcon from "../assets/bus.png";
 import carTopViewIcon from "../assets/car.png";
 import bikeTopViewIcon from "../assets/bike.png";
@@ -47,19 +49,31 @@ export default function Home() {
     const [charges, setCharges] = useState([]);
     const [ongoingParking, setOngoingParking] = useState([]);
     const [rules, setRules] = useState([]);
-const[isDay, setIsDay] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [isDay, setIsDay] = useState(true);
 
+    // Initial Data Fetch
     useEffect(() => {
-        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
-        
-        axios.get("https://api.open-meteo.com/v1/forecast?latitude=23.8103&longitude=90.4125&current_weather=true")
-            .then(res => setWeather(res.data.current_weather))
-            .catch(err => console.error("Weather error", err));
+        const loadInitialData = async () => {
+            try {
+                await Promise.allSettled([
+                    axios.get("https://api.open-meteo.com/v1/forecast?latitude=23.8103&longitude=90.4125&current_weather=true").then(res => setWeather(res.data.current_weather)),
+                    axios.get("http://localhost:5000/api/vehicle-types-and-charges").then(res => setCharges(res.data)),
+                    axios.get("http://localhost:5000/api/rules-and-regulations").then(res => setRules(res.data))
+                ]);
+            } finally {
+                setLoading(false);
+            }
+        };
+        loadInitialData();
+    }, []);
 
-        axios.get("http://localhost:5000/api/vehicle-types-and-charges").then(res => setCharges(res.data));
-        axios.get("http://localhost:5000/api/rules-and-regulations").then(res => setRules(res.data));
-        setIsDay(currentTime.getHours() >= 6 && currentTime.getHours() < 18);
-
+    // Real-time Update Engine (1 Second Interval)
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setCurrentTime(new Date());
+            setIsDay(new Date().getHours() >= 6 && new Date().getHours() < 18);
+        }, 1000);
         return () => clearInterval(timer);
     }, []);
 
@@ -73,21 +87,9 @@ const[isDay, setIsDay] = useState(true);
 
     const fetchOngoing = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/parking/ongoing?uid=${user.uid}`);
+            const res = await axios.get(`http://localhost:5000/api/parking/user-current-parking?uid=${user.uid}`);
             setOngoingParking(res.data);
         } catch (err) { console.error(err); }
-    };
-
-    const cancelBooking = async (id) => {
-        if (!window.confirm("Are you sure you want to cancel this booking?")) return;
-        try {
-            await axios.patch(`http://localhost:5000/api/parking/${id}`, { status: "canceled" });
-            toast.success("Booking canceled successfully!");
-            fetchOngoing();
-        } catch (err) {
-            toast.error("Failed to cancel booking.");
-            console.error(err);
-        }
     };
 
     const getGreeting = () => {
@@ -97,22 +99,28 @@ const[isDay, setIsDay] = useState(true);
         return "Good Evening";
     };
 
-    // Live Calculation 
-   const calculateTimeAndCharge = (entryTime, vehicleType) => {
+    // Helper to format countdown timer (MM:SS)
+    const formatTimer = (startTime) => {
+        const start = new Date(startTime);
+        const expiry = new Date(start.getTime() + 10 * 60000);
+        const diff = Math.max(0, Math.floor((expiry - currentTime) / 1000));
+        const m = Math.floor(diff / 60);
+        const s = diff % 60;
+        return `${m}:${s < 10 ? '0' : ''}${s}`;
+    };
+
+    // Live Calculation Logic for Parking Sessions
+    const calculateLiveStats = (entryTime, vehicleType) => {
         if (!entryTime) return { timeStr: "00:00:00", cost: "0.00" };
-        
         const start = new Date(entryTime);
         const diffMs = currentTime - start;
-        
         const hours = Math.floor(diffMs / 3600000);
         const minutes = Math.floor((diffMs % 3600000) / 60000);
         const seconds = Math.floor((diffMs % 60000) / 1000);
 
         const rateObj = charges.find(c => c.vehicleType.toLowerCase() === vehicleType.toLowerCase());
         const perMinuteRate = rateObj ? parseFloat(rateObj.chargingRate) : 0;
-        
-        const totalMinutesElapsed = diffMs / 60000;
-        const liveCost = (totalMinutesElapsed * perMinuteRate).toFixed(2);
+        const liveCost = ((diffMs / 60000) * perMinuteRate).toFixed(2);
 
         return {
             timeStr: `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`,
@@ -120,36 +128,35 @@ const[isDay, setIsDay] = useState(true);
         };
     };
 
+    if (loading) {
+        return (
+            <div className="d-flex flex-column align-items-center justify-content-center" style={{ height: "80vh" }}>
+                <img src={loadingImg} alt="Logo" style={{ width: "220px", marginBottom: "20px" }} />
+                <BounceLoader color="#6199ff" size={50} />
+            </div>
+        );
+    }
+
     return (
         <div className="container py-4" style={{ maxWidth: "900px" }}>
             <ToastContainer position="top-center" autoClose={3000} />
-            
+
             {/* Banner Section */}
-            <div className="position-relative text-white rounded-4 overflow-hidden mb-4 shadow-lg" 
-                 style={{ height: "280px", background: `url(${bannerImg}) center/cover` }}>
+            <div className="position-relative text-white rounded-4 overflow-hidden mb-4 shadow-lg"
+                style={{ height: "280px", background: `url(${bannerImg}) center/cover` }}>
                 <div className="position-absolute w-100 h-100" style={{ background: "rgba(0,0,0,0.3)" }}></div>
-                
                 <div className="position-absolute top-0 end-0 p-3 text-end">
                     {weather && (
                         <div className="d-flex align-items-center gap-2">
                             <span className="fs-3 fw-bold">{weather.temperature}°C</span>
-                            <span>
-                                {isDay ? (
-                        <Sun size={32} color="orange" />
-                    ) : (
-                        <Moon size={32} color="gray" />
-                    )}
-
-                            </span>
+                            <span>{isDay ? <Sun size={32} color="orange" /> : <Moon size={32} color="gray" />}</span>
                         </div>
                     )}
                 </div>
-
                 <div className="position-absolute bottom-0 start-0 p-4">
                     <h2 className="mb-0 ">{getGreeting()},</h2>
                     <h2 className="fw-light">{user ? user.displayName : "Guest"}</h2>
                 </div>
-
                 <div className="position-absolute bottom-0 end-0 p-4 text-end">
                     <div className="small opacity-75">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                     <div className="fw-bold">{currentTime.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
@@ -158,7 +165,7 @@ const[isDay, setIsDay] = useState(true);
 
             {/* Parking Charges Section */}
             <div className="bg-light rounded-4 p-4 mb-4 shadow-sm border border-white">
-                <h6 className="text-primary fw-bold mb-3 text-start">Parking charges </h6>
+                <h6 className="text-primary fw-bold mb-3 text-start">Parking Charges</h6>
                 <div className="d-flex flex-wrap justify-content-start gap-3">
                     {charges.map((item, idx) => (
                         <div key={idx} className="text-center px-3 border-end" style={{ minWidth: '120px' }}>
@@ -180,33 +187,52 @@ const[isDay, setIsDay] = useState(true);
                     ) : (
                         <div className="row g-3">
                             {ongoingParking.map((p) => {
-                                const liveData = calculateTimeAndCharge(p.entryTime, p.vehicleType);
+                                const liveData = calculateLiveStats(p.entryTime, p.vehicleType);
+                                const isCountdownStatus = ["request_booking", "paid"].includes(p.status);
+
                                 return (
                                     <div key={p._id} className="col-md-6">
-                                        <div className="d-flex align-items-center bg-white p-3 rounded-3 shadow-sm border">
-                                            <img src={iconMap[p.vehicleType.toLowerCase()]?.top} 
-                                                 className="me-3" 
-                                                 style={{ width: "30px", height: "60px", objectFit: "contain" }} />
+                                        <div className="d-flex align-items-center bg-white p-3 rounded-3 shadow-sm border h-100">
+                                            <img src={iconMap[p.vehicleType.toLowerCase()]?.top}
+                                                className="me-3"
+                                                style={{ width: "35px", height: "70px", objectFit: "contain" }} />
                                             <div className="text-start small" style={{ flex: 1 }}>
-                                                <div className="fw-bold text-capitalize">Vehicle Type: {p.vehicleType}  {p.slotNumber && `| Slot: ${p.slotNumber}`}</div>
-                                                <div>Entry Time: {new Date(p.booking_time).toLocaleString()}</div>
-                                                
-                                                {p.status === "parked" ? (
-                                                    <>
-                                                        <div className="fw-bold text-primary">Total Time: {liveData.timeStr}</div>
-                                                        <div className="fw-bold text-success">Live Cost: ৳{liveData.cost}</div>
-                                                    </>
-                                                ) : (
-                                                    <div>Valid Until: {new Date(new Date(p.booking_time).getTime() + 10 * 60000).toLocaleTimeString()}</div>
-                                                )}
+                                                <div className="fw-bold text-capitalize d-flex justify-content-between">
+                                                    <span>{p.vehicleType}</span>
+                                                    <span className="text-muted">{p.slotNumber ? `Slot: ${p.slotNumber}` : "Pending Slot"}</span>
+                                                </div>
 
-                                                <div className="d-flex align-items-center gap-2 mt-1">
-                                                    Status: <span className={`badge ${p.status === "parked" ? "bg-success" : "bg-warning text-dark"}`}>
-                                                        {p.status === "parked" ? "Parked" : "Request Booking"}
-                                                    </span>
-                                                    {p.status === "request_booking" && (
-                                                        <button onClick={() => cancelBooking(p._id)} className="btn btn-danger btn-sm py-0 px-2" style={{ fontSize: '10px' }}>Cancel</button>
+                                                <div className="mt-1">
+                                                    {p.status === "parked" && (
+                                                        <>
+                                                            <div>   <Clock size={12} className="me-1" />Entry Time: {new Date(p.entryTime).toLocaleString()}</div>
+                                                            <div className="text-primary fw-bold"><Clock size={12} /> Time: {liveData.timeStr}</div>
+                                                            <div className="text-success fw-bold">Cost: ৳{liveData.cost}</div>
+                                                        </>
                                                     )}
+
+                                                    {isCountdownStatus && (
+                                                        <div className="text-primary ">
+                                                            <div>   <Clock size={12} className="me-1" />Entry Time: {new Date(p.entryTime).toLocaleString()}</div>
+                                                            <div className="text-danger fw-bold animate-pulse"> <Clock size={12} className="me-1" />Timer: {formatTimer(p.status === "request_booking" ? p.booking_time : p.paidAt)}</div>
+                                                        </div>
+                                                    )}
+
+                                                    {p.status === "repay" && (
+                                                        <div className="text-danger fw-bold">
+                                                            <AlertTriangle size={12} className="me-1" />
+                                                            Action Required: Pay Fine
+                                                        </div>
+                                                    )}
+                                                </div>
+
+                                                <div className="d-flex align-items-center gap-2 mt-2">
+                                                    <span className={`badge ${p.status === "parked" ? "bg-success" :
+                                                            p.status === "repay" ? "bg-danger" :
+                                                                p.status === "paid" ? "bg-info text-white" : "bg-warning text-dark"
+                                                        }`}>
+                                                        {p.status.replace('_', ' ').toUpperCase()}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>

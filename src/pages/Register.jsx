@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, sendEmailVerification } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile  } from "firebase/auth";
 import { auth } from "../firebase";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -13,7 +13,7 @@ export default function Register() {
   const [step, setStep] = useState(1);
   const [initialPageLoad, setInitialPageLoad] = useState(true);
   const [loading, setLoading] = useState(false);
-  
+
   // Form Data
   const [formData, setFormData] = useState({
     name: "", email: "", phone: "", password: "", confirmPassword: ""
@@ -72,9 +72,14 @@ export default function Register() {
       const res = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
       const user = res.user;
 
+      // 2. Update displayName in Firebase
+      await updateProfile(user, {
+        displayName: formData.name
+      });
+
       // 2. Send Email Verification
       await sendEmailVerification(user);
-      
+
       // 3. Save to Backend (Including Terms Agreement)
       await axios.post("http://localhost:5000/api/users/register", {
         uid: user.uid,
@@ -85,7 +90,7 @@ export default function Register() {
       });
 
       toast.success("Registration successful! Please check your email for verification.");
-      
+
       // Navigate to login so they can sign in after verifying
       setTimeout(() => navigate("/login"), 3000);
 
@@ -177,10 +182,10 @@ export default function Register() {
               {formData.confirmPassword && formData.password !== formData.confirmPassword && <span className="text-danger small">Passwords do not match</span>}
             </div>
 
-            <button 
-              className="btn btn-primary w-100 py-3 fw-bold shadow-sm" 
-              style={{ borderRadius: '12px', backgroundColor: isStep1Valid ? '#6199ff' : '#a0c4ff', border: 'none' }} 
-              disabled={!isStep1Valid} 
+            <button
+              className="btn btn-primary w-100 py-3 fw-bold shadow-sm"
+              style={{ borderRadius: '12px', backgroundColor: isStep1Valid ? '#6199ff' : '#a0c4ff', border: 'none' }}
+              disabled={!isStep1Valid}
               onClick={() => setStep(2)}
             >
               Next
@@ -214,10 +219,10 @@ export default function Register() {
               </label>
             </div>
 
-            <button 
-              className="btn btn-primary w-100 py-3 fw-bold shadow-sm" 
-              style={{ borderRadius: '12px', backgroundColor: agreed ? '#6199ff' : '#a0c4ff', border: 'none' }} 
-              disabled={!agreed || loading} 
+            <button
+              className="btn btn-primary w-100 py-3 fw-bold shadow-sm"
+              style={{ borderRadius: '12px', backgroundColor: agreed ? '#6199ff' : '#a0c4ff', border: 'none' }}
+              disabled={!agreed || loading}
               onClick={handleRegister}
             >
               {loading ? "Creating Account..." : "Sign Up"}
