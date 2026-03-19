@@ -11,17 +11,27 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import html2canvas from "html2canvas";
 
+import busIcon from "../assets/bus_icon.png";
+import carIcon from "../assets/car_icon.png";
+import bikeIcon from "../assets/bike_icon.png";
+import bycycleIcon from "../assets/cycle_icon.png";
+import cngIcon from "../assets/cng_icon.png";
+import highCarIcon from "../assets/high_car_icon.png";
+import miniBusIcon from "../assets/mini_bus_icon.png";
+import miniTruckIcon from "../assets/mini_truck_icon.png";
+import truckIcon from "../assets/truck_icon.png";
+
 // Vehicle Icon Mapping
 const vehicleIcons = {
-  bike: <Bike size={22} />,
-  car: <Car size={22} />,
-  "high car": <Car size={22} />,
-  "mini bus": <Bus size={22} />,
-  bus: <Bus size={22} />,
-  truck: <Truck size={22} />,
-  "mini truck": <Truck size={22} />,
-  cng: <Info size={22} />, 
-  bicycle: <Bike size={22} />
+  bike: bikeIcon,
+  car: carIcon,
+  "high car": highCarIcon,
+  "mini bus": miniBusIcon,
+  bus: busIcon,
+  truck: truckIcon,
+  "mini truck": miniTruckIcon,
+  cng: cngIcon, 
+  bicycle: bycycleIcon
 };
 
 export default function History() {
@@ -129,9 +139,9 @@ export default function History() {
                 <div className="text-start">
                   <div className="d-flex align-items-center gap-2 mb-2">
                     <span className="text-primary">
-                      {vehicleIcons[h.vehicleType?.toLowerCase()] || <Car size={22} />}
+                            <img src={vehicleIcons[h.vehicleType.toLowerCase()]} alt="" style={{ height: "30px" }} />
                     </span>
-                    <h6 className="mb-0 fw-bold text-uppercase">{h.vehicleType} - {h.slotNumber}</h6>
+                    <h6 className="mb-0 fw-bold ">{h.vehicleType.charAt(0).toUpperCase() + h.vehicleType.slice(1)} - {h.slotNumber} </h6>
                   </div>
 
                   <div className="small text-muted d-flex flex-column gap-1">

@@ -115,10 +115,9 @@ export default function Booking() {
         <p className="text-muted">Real-time slot availability and active session management</p>
       </div>
 
-      {/* Main Wrapper for Equal Width and Vertical Stacking */}
       <div className="mx-auto" style={{ maxWidth: "800px", width: "80%" }}>
         
-        {/* Availability Section - Always Top */}
+        {/* Availability Section */}
         <div className="mb-5">
           <div className="card border-0 shadow-sm rounded-4 p-4 bg-white">
             <h5 className="fw-bold mb-4 d-flex align-items-center">
@@ -160,7 +159,7 @@ export default function Booking() {
           </div>
         </div>
 
-        {/* Sessions Section - Always Bottom */}
+        {/* Sessions Section */}
         <div className="mb-5">
           <h5 className="fw-bold mb-4">My Parking Sessions</h5>
           {sessions.length === 0 ? (
