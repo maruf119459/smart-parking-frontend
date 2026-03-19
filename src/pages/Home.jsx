@@ -188,7 +188,7 @@ const[isDay, setIsDay] = useState(true);
                                                  className="me-3" 
                                                  style={{ width: "30px", height: "60px", objectFit: "contain" }} />
                                             <div className="text-start small" style={{ flex: 1 }}>
-                                                <div className="fw-bold text-capitalize">Vehicle Type: {p.vehicleType}</div>
+                                                <div className="fw-bold text-capitalize">Vehicle Type: {p.vehicleType}  {p.slotNumber && `| Slot: ${p.slotNumber}`}</div>
                                                 <div>Entry Time: {new Date(p.booking_time).toLocaleString()}</div>
                                                 
                                                 {p.status === "parked" ? (
