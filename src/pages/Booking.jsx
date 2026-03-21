@@ -95,7 +95,7 @@ export default function Booking() {
     vehicleType === "default" ||
     !slotAvailability[vehicleType] ||
     slotAvailability[vehicleType] === 0 ||
-    bookingLoad;
+    bookingLoad || sessions.length > 4;
 
   if (loading) {
     return (
@@ -113,6 +113,7 @@ export default function Booking() {
       <div className="text-center mb-5">
         <h1 className="fw-bold display-6">Vehicle Booking Hub</h1>
         <p className="text-muted">Real-time slot availability and active session management</p>
+        <p className="text-muted fw-bold">You can have a maximum of 5 active parking sessions.</p>
       </div>
 
       <div className="mx-auto" style={{ maxWidth: "800px", width: "80%" }}>
