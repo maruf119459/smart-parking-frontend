@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import logo from "../assets/loading_img.png";
 import { BounceLoader } from "react-spinners";
+import { Helmet } from "react-helmet-async";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -47,7 +48,7 @@ export default function ForgotPassword() {
 
   if (initialPageLoad) {
     return (
-      <div style={{ height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",}}>
+      <div style={{ height: "80vh", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", }}>
         <img src={logo} alt="City Parking Logo" style={{ width: "220px", marginBottom: "20px" }} />
         <BounceLoader color="#6199ff" size={50} />
       </div>
@@ -55,17 +56,21 @@ export default function ForgotPassword() {
   }
 
   return (
-    <div className="container d-flex justify-content-center align-items-center pt-5">
-      <ToastContainer position="top-center" autoClose={3000} />
+    <>
+      <Helmet>
+        <title>City Parking | Forgot Password</title>
+      </Helmet>
+      <div className="container d-flex justify-content-center align-items-center pt-5">
+        <ToastContainer position="top-center" autoClose={3000} />
 
-      <div className=" p-4 rounded-4 border-0" style={{ maxWidth: "450px", width: "100%" }}>
-        {loading ? (
-          <div className="text-center py-5">
-            <BounceLoader color="#6199ff" size={50} className="mx-auto" />
-            <p className="mt-2 text-muted small">Sending reset link...</p>
-          </div>
-        ) : (
-          <div className="px-2">
+        <div className=" p-4 rounded-4 border-0" style={{ maxWidth: "450px", width: "100%" }}>
+          {loading ? (
+            <div className="text-center py-5">
+              <BounceLoader color="#6199ff" size={50} className="mx-auto" />
+              <p className="mt-2 text-muted small">Sending reset link...</p>
+            </div>
+          ) : (
+            <div className="px-2">
               <div className="text-center mb-4">
                 <h3 className="fw-bold mb-2">Forgot Password</h3>
                 <img src={logo} alt="Logo" style={{ width: "150px" }} className="" />
@@ -101,8 +106,9 @@ export default function ForgotPassword() {
                 </button>
               </div>
             </div>
-        )}
-          </div>
-    </div>
-      );
+          )}
+        </div>
+      </div>
+    </>
+  );
 }

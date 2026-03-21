@@ -29,6 +29,7 @@ import highCarIcon from "../assets/high_car_icon.png";
 import miniBusIcon from "../assets/mini_bus_icon.png";
 import miniTruckIcon from "../assets/mini_truck_icon.png";
 import truckIcon from "../assets/truck_icon.png";
+import { Helmet } from "react-helmet-async";
 
 const iconMap = {
     car: { main: carIcon, top: carTopViewIcon },
@@ -138,131 +139,136 @@ export default function Home() {
     }
 
     return (
-        <div className="container py-4" style={{ maxWidth: "900px" }}>
-            <ToastContainer position="top-center" autoClose={3000} />
+        <>
+            <Helmet>
+                <title>City Parking | Home</title>
+            </Helmet>
+            <div className="container py-4" style={{ maxWidth: "900px" }}>
+                <ToastContainer position="top-center" autoClose={3000} />
 
-            {/* Banner Section */}
-            <div className="position-relative text-white rounded-4 overflow-hidden mb-4 shadow-lg"
-                style={{ height: "280px", background: `url(${bannerImg}) center/cover` }}>
-                <div className="position-absolute w-100 h-100" style={{ background: "rgba(0,0,0,0.3)" }}></div>
-                <div className="position-absolute top-0 end-0 p-3 text-end">
-                    {weather && (
-                        <div className="d-flex align-items-center gap-2">
-                            <span className="fs-3 fw-bold">{weather.temperature}°C</span>
-                            <span>{isDay ? <Sun size={32} color="orange" /> : <Moon size={32} color="gray" />}</span>
-                        </div>
-                    )}
-                </div>
-                <div className="position-absolute bottom-0 start-0 p-4">
-                    <h2 className="mb-0 ">{getGreeting()},</h2>
-                    <h2 className="fw-light">{user ? user.displayName : "Guest"}</h2>
-                </div>
-                <div className="position-absolute bottom-0 end-0 p-4 text-end">
-                    <div className="small opacity-75">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                    <div className="fw-bold">{currentTime.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                </div>
-            </div>
-
-            {/* Parking Charges Section */}
-            <div className="bg-light rounded-4 p-4 mb-4 shadow-sm border border-white">
-                <h6 className="text-primary fw-bold mb-3 text-start">Parking Charges</h6>
-                <div className="d-flex flex-wrap justify-content-start gap-3">
-                    {charges.map((item, idx) => (
-                        <div key={idx} className="text-center px-3 border-end" style={{ minWidth: '120px' }}>
-                            <img src={iconMap[item.vehicleType.toLowerCase()]?.main} alt="" style={{ height: "30px" }} />
-                            <div className="small fw-bold mt-2 text-uppercase" style={{ fontSize: '10px' }}>
-                                BDT {item.chargingRate} / {item.timeType === "hourly" ? "hr" : item.timeType}
+                {/* Banner Section */}
+                <div className="position-relative text-white rounded-4 overflow-hidden mb-4 shadow-lg"
+                    style={{ height: "280px", background: `url(${bannerImg}) center/cover` }}>
+                    <div className="position-absolute w-100 h-100" style={{ background: "rgba(0,0,0,0.3)" }}></div>
+                    <div className="position-absolute top-0 end-0 p-3 text-end">
+                        {weather && (
+                            <div className="d-flex align-items-center gap-2">
+                                <span className="fs-3 fw-bold">{weather.temperature}°C</span>
+                                <span>{isDay ? <Sun size={32} color="orange" /> : <Moon size={32} color="gray" />}</span>
                             </div>
-                        </div>
-                    ))}
+                        )}
+                    </div>
+                    <div className="position-absolute bottom-0 start-0 p-4">
+                        <h2 className="mb-0 ">{getGreeting()},</h2>
+                        <h2 className="fw-light">{user ? user.displayName : "Guest"}</h2>
+                    </div>
+                    <div className="position-absolute bottom-0 end-0 p-4 text-end">
+                        <div className="small opacity-75">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                        <div className="fw-bold">{currentTime.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                    </div>
                 </div>
-            </div>
 
-            {/* Ongoing Parking Section */}
-            {user && (
-                <div className="bg-light rounded-4 p-4 mb-4 shadow-sm">
-                    <h6 className="text-primary fw-bold mb-3 text-start">Your Current Parking</h6>
-                    {ongoingParking.length === 0 ? (
-                        <div className="text-muted py-3">You have no ongoing parking.</div>
-                    ) : (
-                        <div className="row g-3">
-                            {ongoingParking.map((p) => {
-                                const liveData = calculateLiveStats(p.entryTime, p.vehicleType);
-                                const isCountdownStatus = ["request_booking", "paid"].includes(p.status);
+                {/* Parking Charges Section */}
+                <div className="bg-light rounded-4 p-4 mb-4 shadow-sm border border-white">
+                    <h6 className="text-primary fw-bold mb-3 text-start">Parking Charges</h6>
+                    <div className="d-flex flex-wrap justify-content-start gap-3">
+                        {charges.map((item, idx) => (
+                            <div key={idx} className="text-center px-3 border-end" style={{ minWidth: '120px' }}>
+                                <img src={iconMap[item.vehicleType.toLowerCase()]?.main} alt="" style={{ height: "30px" }} />
+                                <div className="small fw-bold mt-2 text-uppercase" style={{ fontSize: '10px' }}>
+                                    BDT {item.chargingRate} / {item.timeType === "hourly" ? "hr" : item.timeType}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
 
-                                return (
-                                    <div key={p._id} className="col-md-6">
-                                        <div className="d-flex align-items-center bg-white p-3 rounded-3 shadow-sm border h-100">
-                                            <img src={iconMap[p.vehicleType.toLowerCase()]?.top}
-                                                className="me-3"
-                                                style={{ width: "35px", height: "70px", objectFit: "contain" }} />
-                                            <div className="text-start small" style={{ flex: 1 }}>
-                                                <div className="fw-bold text-capitalize d-flex justify-content-between">
-                                                    <span>{p.vehicleType}</span>
-                                                    <span className="text-muted">{p.slotNumber ? `Slot: ${p.slotNumber}` : "Pending Slot"}</span>
-                                                </div>
+                {/* Ongoing Parking Section */}
+                {user && (
+                    <div className="bg-light rounded-4 p-4 mb-4 shadow-sm">
+                        <h6 className="text-primary fw-bold mb-3 text-start">Your Current Parking</h6>
+                        {ongoingParking.length === 0 ? (
+                            <div className="text-muted py-3">You have no ongoing parking.</div>
+                        ) : (
+                            <div className="row g-3">
+                                {ongoingParking.map((p) => {
+                                    const liveData = calculateLiveStats(p.entryTime, p.vehicleType);
+                                    const isCountdownStatus = ["request_booking", "paid"].includes(p.status);
 
-                                                <div className="mt-1">
-                                                    {p.status === "parked" && (
-                                                        <>
-                                                            <div>   <Clock size={12} className="me-1" />Entry Time: {new Date(p.entryTime).toLocaleString()}</div>
-                                                            <div className="text-primary fw-bold"><Clock size={12} /> Time: {liveData.timeStr}</div>
-                                                            <div className="text-success fw-bold">Cost: ৳{liveData.cost}</div>
-                                                        </>
-                                                    )}
+                                    return (
+                                        <div key={p._id} className="col-md-6">
+                                            <div className="d-flex align-items-center bg-white p-3 rounded-3 shadow-sm border h-100">
+                                                <img src={iconMap[p.vehicleType.toLowerCase()]?.top}
+                                                    className="me-3"
+                                                    style={{ width: "35px", height: "70px", objectFit: "contain" }} />
+                                                <div className="text-start small" style={{ flex: 1 }}>
+                                                    <div className="fw-bold text-capitalize d-flex justify-content-between">
+                                                        <span>{p.vehicleType}</span>
+                                                        <span className="text-muted">{p.slotNumber ? `Slot: ${p.slotNumber}` : "Pending Slot"}</span>
+                                                    </div>
 
-                                                    {isCountdownStatus && (
-                                                        <div className="text-primary ">
-                                                            <div>   <Clock size={12} className="me-1" />Entry Time: {new Date(p.entryTime).toLocaleString()}</div>
-                                                            <div className="text-danger fw-bold animate-pulse"> <Clock size={12} className="me-1" />Timer: {formatTimer(p.status === "request_booking" ? p.booking_time : p.paidAt)}</div>
-                                                        </div>
-                                                    )}
+                                                    <div className="mt-1">
+                                                        {p.status === "parked" && (
+                                                            <>
+                                                                <div>   <Clock size={12} className="me-1" />Entry Time: {new Date(p.entryTime).toLocaleString()}</div>
+                                                                <div className="text-primary fw-bold"><Clock size={12} /> Time: {liveData.timeStr}</div>
+                                                                <div className="text-success fw-bold">Cost: ৳{liveData.cost}</div>
+                                                            </>
+                                                        )}
 
-                                                    {p.status === "repay" && (
-                                                        <div className="text-danger fw-bold">
-                                                            <AlertTriangle size={12} className="me-1" />
-                                                            Action Required: Pay Fine
-                                                        </div>
-                                                    )}
-                                                </div>
+                                                        {isCountdownStatus && (
+                                                            <div className="text-primary ">
+                                                                <div>   <Clock size={12} className="me-1" />Entry Time: {new Date(p.entryTime).toLocaleString()}</div>
+                                                                <div className="text-danger fw-bold animate-pulse"> <Clock size={12} className="me-1" />Timer: {formatTimer(p.status === "request_booking" ? p.booking_time : p.paidAt)}</div>
+                                                            </div>
+                                                        )}
 
-                                                <div className="d-flex align-items-center gap-2 mt-2">
-                                                    <span className={`badge ${p.status === "parked" ? "bg-success" :
+                                                        {p.status === "repay" && (
+                                                            <div className="text-danger fw-bold">
+                                                                <AlertTriangle size={12} className="me-1" />
+                                                                Action Required: Pay Fine
+                                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    <div className="d-flex align-items-center gap-2 mt-2">
+                                                        <span className={`badge ${p.status === "parked" ? "bg-success" :
                                                             p.status === "repay" ? "bg-danger" :
                                                                 p.status === "paid" ? "bg-info text-white" : "bg-warning text-dark"
-                                                        }`}>
-                                                        {p.status.replace('_', ' ').toUpperCase()}
-                                                    </span>
+                                                            }`}>
+                                                            {p.status.replace('_', ' ').toUpperCase()}
+                                                        </span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
-                </div>
-            )}
+                                    );
+                                })}
+                            </div>
+                        )}
+                    </div>
+                )}
 
-            {/* Rules and Regulation Section */}
-            <div className="bg-white rounded-4 p-4 shadow-sm border">
-                <h4 className="mb-2 text-center border-bottom pb-2">Rules and Regulation</h4>
-                <div className="text-start">
-                    {rules.map((rule, idx) => (
-                        <div key={idx} className="mb-4">
-                            <h6 className="fw-bold text-primary">{idx + 1}. {rule.section_title}</h6>
-                            <p className="text-muted small">{rule.message}</p>
-                            {rule.point && (
-                                <ul className="list-unstyled ps-3 small text-muted">
-                                    {Object.values(rule.point).map((p, i) => (
-                                        <li key={i} className="mb-1">• {p}</li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    ))}
+                {/* Rules and Regulation Section */}
+                <div className="bg-white rounded-4 p-4 shadow-sm border">
+                    <h4 className="mb-2 text-center border-bottom pb-2">Rules and Regulation</h4>
+                    <div className="text-start">
+                        {rules.map((rule, idx) => (
+                            <div key={idx} className="mb-4">
+                                <h6 className="fw-bold text-primary">{idx + 1}. {rule.section_title}</h6>
+                                <p className="text-muted small">{rule.message}</p>
+                                {rule.point && (
+                                    <ul className="list-unstyled ps-3 small text-muted">
+                                        {Object.values(rule.point).map((p, i) => (
+                                            <li key={i} className="mb-1">• {p}</li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
