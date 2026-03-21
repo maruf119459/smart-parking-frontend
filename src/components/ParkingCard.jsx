@@ -109,6 +109,7 @@ export default function ParkingCard({ data, dbUser }) {
       const res = await axios.post("http://localhost:5000/api/payment/init", {
         parkingId: data._id, amount: finalAmount,
         name: user?.displayName || dbUser?.name,
+        uid: user?.uid,
         email: user?.email || dbUser?.email,
         phone: user?.phoneNumber || dbUser?.phone,
         vehicleType: data.vehicleType
