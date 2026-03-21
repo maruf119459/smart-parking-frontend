@@ -36,9 +36,9 @@ const iconMap = {
     bus: { main: busIcon, top: busTopViewIcon },
     bicycle: { main: bycycleIcon, top: bycycleTopViewIcon },
     cng: { main: cngIcon, top: cngTopViewIcon },
-    "high car": { main: highCarIcon, top: highCarTopViewIcon },
-    "mini bus": { main: miniBusIcon, top: miniBusTopViewIcon },
-    "mini truck": { main: miniTruckIcon, top: miniTruckTopViewIcon },
+    "high_car": { main: highCarIcon, top: highCarTopViewIcon },
+    "mini_bus": { main: miniBusIcon, top: miniBusTopViewIcon },
+    "mini_truck": { main: miniTruckIcon, top: miniTruckTopViewIcon },
     truck: { main: truckIcon, top: truckTopViewIcon },
 };
 

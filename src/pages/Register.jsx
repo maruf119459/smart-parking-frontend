@@ -1,4 +1,4 @@
-import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile  } from "firebase/auth";
+import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth";
 import { auth } from "../firebase";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -25,6 +25,7 @@ export default function Register() {
   const [passStrength, setPassStrength] = useState(0);
   const [agreed, setAgreed] = useState(false);
   const [terms, setTerms] = useState([]);
+  const { password } = formData;
 
   const navigate = useNavigate();
 
@@ -119,12 +120,10 @@ export default function Register() {
     <div className="d-flex flex-column align-items-center pt-4 pb-5">
       <ToastContainer position="top-center" autoClose={3000} />
 
-      <div className="px-4" style={{ width: "100%", maxWidth: "500px" }}>
+      <div style={{ width: "100%", maxWidth: "450px" }} className="px-4">
         <div className="text-center mb-4">
-          <h4 className="fw-bold mb-1" style={{ color: '#4a4a8a', fontStyle: 'italic' }}>
-            {step === 1 ? "Sign Up" : "Terms and Conditions"}
-          </h4>
-          <img src={logo} alt="Logo" className="img-fluid my-3" style={{ width: "180px" }} />
+          <h3 className="fw-bold mb-2"> {step === 1 ? "Sign Up" : "Terms and Conditions"}</h3>
+          <img src={logo} alt="Logo" style={{ width: "150px" }} className="" />
         </div>
 
         {step === 1 ? (
@@ -168,6 +167,11 @@ export default function Register() {
                   {showPass ? <EyeOff size={20} className="text-muted" /> : <Eye size={20} className="text-muted" />}
                 </span>
               </div>
+              {passStrength < 100 && password.length > 0 && (
+                <span className="text-muted x-small" style={{ fontSize: '11px' }}>
+                  Must be 8+ chars, include letters, numbers, & symbols.
+                </span>
+              )}
             </div>
 
             {/* Confirm Password */}
@@ -232,7 +236,7 @@ export default function Register() {
         )}
 
         <p className="text-center mt-4 text-muted">
-          Already have an account? <Link to="/login" className="text-primary text-decoration-none fw-bold">Sign In</Link>
+          Already have an account? <Link to="/login" className="text-primary text-decoration-none fw-bold">Login</Link>
         </p>
       </div>
     </div>

@@ -133,8 +133,8 @@ export default function Profile() {
       <div className="row justify-content-center">
         <div className="col-md-8 col-lg-6">
           <div className="text-center mb-4">
-            <h2 className="fw-bold italic" style={{ color: '#4a4a8a', fontStyle: 'italic' }}>My Profile</h2>
-            <p className="small fw-bold" style={{ color: '#070708' }}>Your Unique ID: {profile.uid}</p>
+      <h2 className="fw-bold display-6 text-center">My Profile</h2>
+            <p className="small fw-bold text-muted" >Your Unique ID: {profile.uid}</p>
           </div>
 
           {/* Stats Section */}

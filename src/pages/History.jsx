@@ -136,7 +136,7 @@ export default function History() {
 console.log("History:", history);
   return (
     <div className="container py-4" style={{ maxWidth: '640px' }}>
-      <h2 className="fw-bold mb-4 text-center" style={{ color: '#4a4a8a', fontStyle: 'italic' }}>Parking History</h2>
+      <h2 className="fw-bold display-6 text-center">Parking History</h2>
 
       {/* Date Search Section */}
       <div className="card border-0 shadow-sm p-3 mb-4" style={{ borderRadius: '15px' }}>
@@ -241,6 +241,8 @@ console.log("History:", history);
                       {payments.map((p, idx) => (
                         <div key={idx} className="mb-3 small pb-2 border-bottom border-light">
                           <div className="text-muted">Transaction ID: {p.tran_id}</div>
+                          <div className="text-muted">Bank Name: {p.bankName ||'-'}</div>
+                          <div className="text-muted">Account Type: {p.accountType ||'-'}</div>
                           <div className="text-muted">Customer Phone: {p.cus_phone}</div>
                           <div className="text-muted">Paid at: {new Date(p.paidAt).toLocaleString('en-GB', { day: 'numeric', month: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true })}</div>
                           <div className="d-flex justify-content-between fw-bold mt-1">
@@ -334,6 +336,8 @@ function InvoiceTemplate({ id, h, payments, total, user }) {
           ["Entry Time", formatDate(h.entryTime)],
           ["Exit Time", formatDate(h.exitTime)],
           ["Total Parking Time", totalParkingTime()],
+          ["Bank Name", payments.map(p => p.bankName || '-').join(", ")],
+          ["Account Type", payments.map(p => p.accountType || '-').join(", ")],
           ["Transaction ID", payments.map(p => p.tran_id).join(", ")],
           ["Paid Amount", payments.map(p => `৳${p.amount}`).join(", ")],
           ["Paid At", payments.map(p => formatDate(p.paidAt)).join(", ")],

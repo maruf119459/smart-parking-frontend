@@ -51,10 +51,10 @@ export default function Login() {
       <ToastContainer position="top-center" autoClose={2000} />
 
       <div style={{ width: "100%", maxWidth: "450px" }} className="px-4">
-        <div className="text-center mb-4">
-          <h2 style={{ fontFamily: 'serif', fontStyle: 'italic' }}>Log in</h2>
-          <img src={logo} alt="City Parking" className="img-fluid my-4" style={{ width: "220px" }} />
-        </div>
+          <div className="text-center mb-4">
+            <h3 className="fw-bold mb-2">Login</h3>
+            <img src={logo} alt="Logo" style={{ width: "150px" }} className="" />
+          </div>
 
         <form onSubmit={handleLogin}>
           <div className="mb-3">
