@@ -5,8 +5,7 @@ import { useAuth } from "../AuthContext";
 import { BounceLoader } from "react-spinners";
 import loadingImg from "../assets/loading_img.png";
 import {
-  ChevronDown, ChevronUp, Download, Car, Bike, Bus,
-  Truck, Info
+  ChevronDown, ChevronUp, Download, ChevronLeft, ChevronRight 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import html2canvas from "html2canvas";
@@ -21,15 +20,14 @@ import miniBusIcon from "../assets/mini_bus_icon.png";
 import miniTruckIcon from "../assets/mini_truck_icon.png";
 import truckIcon from "../assets/truck_icon.png";
 
-// Vehicle Icon Mapping
 const vehicleIcons = {
   bike: bikeIcon,
   car: carIcon,
-  "high car": highCarIcon,
-  "mini bus": miniBusIcon,
+  "high_car": highCarIcon,
+  "mini_bus": miniBusIcon,
   bus: busIcon,
   truck: truckIcon,
-  "mini truck": miniTruckIcon,
+  "mini_truck": miniTruckIcon,
   cng: cngIcon, 
   bicycle: bycycleIcon
 };
@@ -41,7 +39,9 @@ export default function History() {
   const [expandedId, setExpandedId] = useState(null);
   const [paymentDetails, setPaymentDetails] = useState({});
 
-  console.log(history)
+  // Pagination States
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const loadHistory = async () => {
     try {
@@ -71,7 +71,6 @@ export default function History() {
 
   const downloadInvoice = async (h) => {
     let currentPayments = paymentDetails[h._id];
-
     if (!currentPayments) {
       try {
         const res = await axios.get(`http://localhost:5000/api/payments/${h._id}`);
@@ -86,7 +85,6 @@ export default function History() {
     setTimeout(async () => {
       const element = document.getElementById(`invoice-template-${h._id}`);
       if (!element) return;
-
       element.style.display = "block";
       const canvas = await html2canvas(element, { scale: 3, useCORS: true });
       const data = canvas.toDataURL("image/png");
@@ -105,6 +103,17 @@ export default function History() {
     return () => socket.off("db_update");
   }, [user]);
 
+  // Pagination Logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = history.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(history.length / itemsPerPage);
+
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+    window.scrollTo(0, 0); // Optional: scroll to top when page changes
+  };
+
   if (loading) {
     return (
       <div className="d-flex flex-column align-items-center justify-content-center" style={{ height: "80vh" }}>
@@ -118,7 +127,7 @@ export default function History() {
     <div className="container py-4" style={{ maxWidth: '640px' }}>
       <h2 className="fw-bold mb-4 text-center" style={{ color: '#4a4a8a', fontStyle: 'italic' }}>Parking History</h2>
 
-      {history.map((h) => {
+      {currentItems.map((h) => {
         const isCanceled = h.status === "canceled";
         const payments = paymentDetails[h._id] || [];
         const totalPaid = payments.reduce((sum, p) => sum + p.amount, 0);
@@ -135,11 +144,10 @@ export default function History() {
           >
             <div className="card-body p-3">
               <div className="d-flex justify-content-between">
-                {/* Information Column */}
                 <div className="text-start">
                   <div className="d-flex align-items-center gap-2 mb-2">
                     <span className="text-primary">
-                            <img src={vehicleIcons[h.vehicleType.toLowerCase()]} alt="" style={{ height: "30px" }} />
+                      <img src={vehicleIcons[h.vehicleType.toLowerCase()]} alt="" style={{ height: "30px" }} />
                     </span>
                     <h6 className="mb-0 fw-bold ">{h.vehicleType.charAt(0).toUpperCase() + h.vehicleType.slice(1)} - {h.slotNumber} </h6>
                   </div>
@@ -152,13 +160,9 @@ export default function History() {
                   </div>
                 </div>
 
-                {/* Actions Column */}
                 {!isCanceled && (
                   <div className="d-flex flex-column justify-content-between align-items-end">
-                    <button
-                      className="btn btn-outline-primary btn-sm border-0"
-                      onClick={() => downloadInvoice(h)} // Pass the whole object 'h'
-                    >
+                    <button className="btn btn-outline-primary btn-sm border-0" onClick={() => downloadInvoice(h)}>
                       <Download size={20} />
                     </button>
                     <button className="btn btn-light btn-sm rounded-circle shadow-sm" onClick={() => toggleDetails(h._id)}>
@@ -168,11 +172,10 @@ export default function History() {
                 )}
               </div>
 
-              {/* Payment Details Drawer */}
               <AnimatePresence>
                 {expandedId === h._id && (
                   <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="mt-3 pt-3 border-top">
-                      <div className="d-flex justify-content-between fw-bold pb-2">
+                    <div className="d-flex justify-content-between fw-bold pb-2">
                       <span>Parking Rate</span>
                       <span className="text-primary">{h.parkingRate}</span>
                     </div>
@@ -195,12 +198,41 @@ export default function History() {
                 )}
               </AnimatePresence>
             </div>
-
-            {/* Hidden Invoice Template */}
             <InvoiceTemplate id={`invoice-template-${h._id}`} h={h} payments={payments} total={totalPaid} user={user} />
           </motion.div>
         );
       })}
+
+      {/* Pagination Controls */}
+      {totalPages > 1 && (
+        <nav className="d-flex justify-content-center mt-4">
+          <ul className="pagination pagination-sm gap-1">
+            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+              <button className="page-link rounded-circle border-0 shadow-sm" onClick={() => paginate(currentPage - 1)}>
+                <ChevronLeft size={18} />
+              </button>
+            </li>
+
+            {[...Array(totalPages)].map((_, i) => (
+              <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                <button 
+                  className={`page-link rounded-circle border-0 shadow-sm mx-1 ${currentPage === i + 1 ? 'bg-primary text-white' : 'bg-white text-dark'}`} 
+                  onClick={() => paginate(i + 1)}
+                  style={{ width: '35px', height: '35px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                >
+                  {i + 1}
+                </button>
+              </li>
+            ))}
+
+            <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+              <button className="page-link rounded-circle border-0 shadow-sm" onClick={() => paginate(currentPage + 1)}>
+                <ChevronRight size={18} />
+              </button>
+            </li>
+          </ul>
+        </nav>
+      )}
     </div>
   );
 }
@@ -218,7 +250,6 @@ function InvoiceTemplate({ id, h, payments, total, user }) {
 
   return (
     <div id={id} style={{ display: 'none', width: '700px', padding: '50px', backgroundColor: 'white' }}>
-      {/* Header */}
       <div className="d-flex justify-content-between align-items-start mb-2">
         <img src={loadingImg} alt="Logo" style={{ width: '120px' }} />
         <div className="text-end">
@@ -226,10 +257,7 @@ function InvoiceTemplate({ id, h, payments, total, user }) {
           <p className="text-muted small">Date: {new Date().toLocaleDateString()}</p>
         </div>
       </div>
-
       <hr style={{ border: '1px solid #eee' }} />
-
-      {/* Grid Data */}
       <div className="py-3">
         {[
           ["Customer Name", h?.name || "N/A"],
@@ -253,14 +281,12 @@ function InvoiceTemplate({ id, h, payments, total, user }) {
           </div>
         ))}
       </div>
-
       <div className="d-flex justify-content-end mt-4">
         <div className="text-end p-3 rounded" style={{ backgroundColor: '#f8f9fa', width: '250px' }}>
           <span className="fw-bold text-muted">Total Paid</span>
           <h3 className="fw-bold text-primary mb-0">৳{total.toFixed(2)}</h3>
         </div>
       </div>
-
       <hr className="mt-5" />
       <div className="text-center text-muted small">
         <p className="mb-1">Thank you for using City Parking!</p>
