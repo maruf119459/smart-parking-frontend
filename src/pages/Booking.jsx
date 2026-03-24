@@ -19,10 +19,11 @@ export default function Booking() {
   const [loading, setLoading] = useState(true);
   const [bookingLoad, setBookingLoad] = useState(false);
   const [dbUser, setDbUser] = useState(null);
+  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
 
   const loadData = async () => {
     try {
-      const slotsRes = await axios.get("http://localhost:5000/api/slots/available");
+      const slotsRes = await axios.get(`${BASE_URL}/api/slots/available`);
       const availabilityMap = {};
       slotsRes.data.forEach(item => {
         availabilityMap[item.vehicleType.toLowerCase()] = item.available;
@@ -30,7 +31,7 @@ export default function Booking() {
       setSlotAvailability(availabilityMap);
 
       const parkingRes = await axios.get(
-        `http://localhost:5000/api/parking/user-current-parking?uid=${user.uid}`
+        `${BASE_URL}/api/parking/user-current-parking?uid=${user.uid}`
       );
       setSessions(parkingRes.data);
     } catch (err) {
@@ -42,7 +43,7 @@ export default function Booking() {
 
   const loadVehicleTypes = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/vehicle-types-and-charges");
+      const res = await axios.get(`${BASE_URL}/api/vehicle-types-and-charges`);
       setVehicleTypesData(res.data);
     } catch (err) {
       toast.error("Failed to load vehicle rates");
@@ -51,7 +52,7 @@ export default function Booking() {
 
   const loadUserData = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/users/${user.uid}`);
+      const res = await axios.get(`${BASE_URL}/api/users/${user.uid}`);
       setDbUser(res.data);
     } catch (err) {
       toast.error("Failed to load user data");
@@ -74,7 +75,7 @@ export default function Booking() {
       const selectedTypeData = vehicleTypesData.find(v => v.vehicleType.toLowerCase() === vehicleType);
       const rateString = `${selectedTypeData.chargingRate} ${selectedTypeData.currency} / ${selectedTypeData.timeType}`;
 
-      await axios.post("http://localhost:5000/api/parking/book", {
+      await axios.post(`${BASE_URL}/api/parking/book`, {
         uid: user.uid,
         vehicleType,
         name: dbUser?.name || user.displayName,

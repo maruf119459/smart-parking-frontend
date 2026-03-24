@@ -1,2 +1,3 @@
 import { io } from "socket.io-client";
-export const socket = io("http://localhost:5000");
+const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+export const socket = io("https://smart-parking-backend-u47b.onrender.com");

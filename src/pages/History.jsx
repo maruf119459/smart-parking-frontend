@@ -48,10 +48,13 @@ export default function History() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
+  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+
+
   const loadHistory = async () => {
     try {
       setLoading(true);
-      let url = `http://localhost:5000/api/parking/user-history?uid=${user.uid}`;
+      let url = `${BASE_URL}/api/parking/user-history?uid=${user.uid}`;
 
       if (startDate && endDate) {
         url += `&startDate=${startDate}&endDate=${endDate}`;
@@ -74,7 +77,7 @@ export default function History() {
     }
     try {
       if (!paymentDetails[parkingId]) {
-        const res = await axios.get(`http://localhost:5000/api/payments/${parkingId}`);
+        const res = await axios.get(`${BASE_URL}/api/payments/${parkingId}`);
         setPaymentDetails(prev => ({ ...prev, [parkingId]: res.data }));
       }
       setExpandedId(parkingId);
@@ -85,7 +88,7 @@ export default function History() {
     let currentPayments = paymentDetails[h._id];
     if (!currentPayments) {
       try {
-        const res = await axios.get(`http://localhost:5000/api/payments/${h._id}`);
+        const res = await axios.get(`${BASE_URL}/api/payments/${h._id}`);
         currentPayments = res.data;
         setPaymentDetails(prev => ({ ...prev, [h._id]: res.data }));
       } catch (err) {

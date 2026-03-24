@@ -22,17 +22,20 @@ export default function ParkingCard({ data, dbUser }) {
   const [totalRepayFee, setTotalRepayFee] = useState(0);
   const [currentCharge, setCurrentCharge] = useState(0);
 
+  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+
+
   const user = auth.currentUser;
 
   useEffect(() => {
     if (!data?.vehicleType) return;
-    axios.get("http://localhost:5000/api/vehicle-types-and-charges")
+    axios.get(`${BASE_URL}/api/vehicle-types-and-charges`)
       .then(res => {
         const match = res.data.find(v => v.vehicleType.toLowerCase() === data.vehicleType.toLowerCase());
         if (match) setRate(match.chargingRate);
       });
 
-    axios.get(`http://localhost:5000/api/payments/${data._id}`)
+    axios.get(`${BASE_URL}/api/payments/${data._id}`)
       .then(res => {
         setPaymentHistory(res.data);
         if (data.status === "repay" && res.data.length > 0) {
@@ -78,13 +81,13 @@ export default function ParkingCard({ data, dbUser }) {
   const handleAutoUpdate = async (currentStatus) => {
     const nextStatus = currentStatus === "request_booking" ? "canceled" : "repay";
     try {
-      await axios.patch(`http://localhost:5000/api/parking/${data._id}`, { status: nextStatus });
+      await axios.patch(`${BASE_URL}/api/parking/${data._id}`, { status: nextStatus });
     } catch (err) { console.error(err); }
   };
 
   const confirmCancelRequest = async () => {
     try {
-      await axios.patch(`http://localhost:5000/api/parking/${data._id}`, { status: "canceled" });
+      await axios.patch(`${BASE_URL}/api/parking/${data._id}`, { status: "canceled" });
       toast.info("Booking request canceled.");
       setShowCancelConfirm(false);
     } catch (err) { toast.error("Failed to cancel request."); }
@@ -94,7 +97,7 @@ export default function ParkingCard({ data, dbUser }) {
     setQrLoading(true);
     setShowModal(true);
     try {
-      const url = type === 'entrance' ? "http://localhost:5000/api/qr/entrance" : "http://localhost:5000/api/qr/exit";
+      const url = type === 'entrance' ? `${BASE_URL}/api/qr/entrance` : `${BASE_URL}/api/qr/exit`;
       const res = await axios.post(url, type === 'entrance' ? data : { parkingId: data._id });
       setQr(res.data.qr);
     } catch (err) {
@@ -106,7 +109,7 @@ export default function ParkingCard({ data, dbUser }) {
   const handlePayment = async () => {
     const finalAmount = data.status === "repay" ? totalRepayFee : liveCost;
     try {
-      const res = await axios.post("http://localhost:5000/api/payment/init", {
+      const res = await axios.post(`${BASE_URL}/api/payment/init`, {
         parkingId: data._id, amount: finalAmount,
         name: user?.displayName || dbUser?.name,
         uid: user?.uid,
