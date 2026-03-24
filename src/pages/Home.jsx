@@ -53,14 +53,17 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [isDay, setIsDay] = useState(true);
 
+    const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+
+
     // Initial Data Fetch
     useEffect(() => {
         const loadInitialData = async () => {
             try {
                 await Promise.allSettled([
                     axios.get("https://api.open-meteo.com/v1/forecast?latitude=23.8103&longitude=90.4125&current_weather=true").then(res => setWeather(res.data.current_weather)),
-                    axios.get("http://localhost:5000/api/vehicle-types-and-charges").then(res => setCharges(res.data)),
-                    axios.get("http://localhost:5000/api/rules-and-regulations").then(res => setRules(res.data))
+                    axios.get(`${BASE_URL}/api/vehicle-types-and-charges`).then(res => setCharges(res.data)),
+                    axios.get(`${BASE_URL}/api/rules-and-regulations`).then(res => setRules(res.data))
                 ]);
             } finally {
                 setLoading(false);
@@ -88,7 +91,7 @@ export default function Home() {
 
     const fetchOngoing = async () => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/parking/user-current-parking?uid=${user.uid}`);
+            const res = await axios.get(`${BASE_URL}/api/parking/user-current-parking?uid=${user.uid}`);
             setOngoingParking(res.data);
         } catch (err) { console.error(err); }
     };

@@ -32,6 +32,8 @@ export default function Profile() {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [passStrength, setPassStrength] = useState(0);
 
+  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+
   useEffect(() => {
     if (user) loadData();
   }, [user]);
@@ -39,8 +41,8 @@ export default function Profile() {
   const loadData = async () => {
     try {
       const [profRes, statRes] = await Promise.all([
-        axios.get(`http://localhost:5000/api/users/${user.uid}`),
-        axios.get(`http://localhost:5000/api/parking/stats/${user.uid}`)
+        axios.get(`${BASE_URL}/api/users/${user.uid}`),
+        axios.get(`${BASE_URL}/api/parking/stats/${user.uid}`)
       ]);
       console.log("Stats Data:", statRes.data);
       setProfile(profRes.data);
@@ -82,7 +84,7 @@ export default function Profile() {
     if (Object.keys(updates).length === 0) return toast.warn("Nothing to update");
 
     try {
-      await axios.patch("http://localhost:5000/api/users/update-profile", { uid: user.uid, ...updates });
+      await axios.patch(`${BASE_URL}/api/users/update-profile`, { uid: user.uid, ...updates });
       toast.success("Profile updated!");
       loadData();
       setUpdateNameChecked(false);

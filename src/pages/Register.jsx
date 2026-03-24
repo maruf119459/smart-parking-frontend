@@ -28,6 +28,9 @@ export default function Register() {
   const [terms, setTerms] = useState([]);
   const { password } = formData;
 
+  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +41,7 @@ export default function Register() {
 
   const fetchTerms = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/terms-and-conditions");
+      const res = await axios.get(`${BASE_URL}/api/terms-and-conditions`);
       setTerms(res.data.sort((a, b) => a.sl - b.sl));
     } catch (err) {
       console.error("Error fetching terms", err);
@@ -83,7 +86,7 @@ export default function Register() {
       await sendEmailVerification(user);
 
       // 3. Save to Backend (Including Terms Agreement)
-      await axios.post("http://localhost:5000/api/users/register", {
+      await axios.post(`${BASE_URL}/api/users/register`, {
         uid: user.uid,
         name: formData.name,
         email: formData.email,

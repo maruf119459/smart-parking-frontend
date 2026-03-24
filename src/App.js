@@ -41,3 +41,7 @@ export default function App() {
     </AuthProvider>
   );
 }
+
+/* https://smart-parking-backend-u47b.onrender.com - production backend (https:// smart-parking-backend-u47b.onrender.com)
+   http://localhost:5000 - local backend
+*/
