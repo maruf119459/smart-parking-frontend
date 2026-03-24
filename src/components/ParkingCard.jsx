@@ -16,16 +16,24 @@ export default function ParkingCard({ data, dbUser }) {
   const [rate, setRate] = useState(0);
   const [timeLeft, setTimeLeft] = useState(null);
   const [paymentHistory, setPaymentHistory] = useState([]);
-  
+
   const [fineAmount, setFineAmount] = useState(100);
   const [additionalMinutes, setAdditionalMinutes] = useState(0);
   const [totalRepayFee, setTotalRepayFee] = useState(0);
   const [currentCharge, setCurrentCharge] = useState(0);
+  const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+
 
   const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
 
 
   const user = auth.currentUser;
+
+  useEffect(() => {
+    const handleResize = () => setScreenWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     if (!data?.vehicleType) return;
@@ -133,6 +141,29 @@ export default function ParkingCard({ data, dbUser }) {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
+  // 🎯 Conditions
+  const isMobile = screenWidth <= 450;
+  const isTablet = screenWidth > 450 && screenWidth < 768;
+  const isDesktop = screenWidth >= 768;
+
+  // 🎯 Layout logic
+  let flexDirection = "row";
+  let justifyContent = "flex-start";
+  let alignItems = "center";
+
+  if (data.status === "request_booking") {
+    if (isMobile) {
+      flexDirection = "column";
+      alignItems = "flex-start";
+    } else if (isTablet) {
+      flexDirection = "row";
+      justifyContent = "space-between";
+    } else if (isDesktop) {
+      flexDirection = "column";
+      alignItems = "flex-end";
+    }
+  }
+
   const formatTime = (mins) => `${Math.floor(mins / 60)}h:${mins % 60}m`;
 
   if (["canceled", "completed"].includes(data.status)) return null;
@@ -176,7 +207,7 @@ export default function ParkingCard({ data, dbUser }) {
                 {data.status === "repay" && (
                   <div className="mt-2">
                     <div><b>Entry:</b> {new Date(data.entryTime).toLocaleString()}</div>
-                    <div><b>Last Exit Deadline:</b> {new Date(new Date(paymentHistory[paymentHistory.length-1]?.paidAt || Date.now()).getTime() + 10 * 60000).toLocaleTimeString()}</div>
+                    <div><b>Last Exit Deadline:</b> {new Date(new Date(paymentHistory[paymentHistory.length - 1]?.paidAt || Date.now()).getTime() + 10 * 60000).toLocaleTimeString()}</div>
                     <div className="text-danger fw-bold">Outstanding Time: {formatTime(additionalMinutes)}</div>
                     <div className="text-danger fw-bold">Fine: ৳{fineAmount} | Current Charge : ৳{currentCharge}</div>
                   </div>
@@ -198,18 +229,45 @@ export default function ParkingCard({ data, dbUser }) {
               {timeLeft !== null && (data.status === "request_booking" || data.status === "paid") && (
                 <div className="d-flex flex-column align-items-start align-items-md-end gap-2">
                   <div className="small fw-bold text-danger animate-pulse">Timer: {formatTimer(timeLeft)}</div>
-                  
+
                   {/* Flex container that changes behavior based on screen size */}
-                  <div className={`d-flex ${data.status === "request_booking" ? "flex-row flex-md-column" : ""} gap-2 w-100 justify-content-start justify-content-md-end`}>
-                    <button onClick={() => generateQR(data.status === 'paid' ? 'exit' : 'entrance')}
-                      className="btn btn-primary rounded-pill px-4 fw-bold shadow-sm w-100 w-md-auto order-1">
-                      <QrCode size={18} className="me-2" /> {data.status === 'paid' ? "Get QR" : "Get QR"}
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection,
+                      gap: "8px",
+                      width: "100%",
+                      justifyContent,
+                      alignItems,
+                    }}
+                  >
+                    {/* Cancel Button (conditionally placed first for mobile) */}
+                    {data.status === "request_booking" && isMobile && (
+                      <button
+                        onClick={() => setShowCancelConfirm(true)}
+                        style={buttonStyle("outline")}
+                      >
+                        Cancel
+                      </button>
+                    )}
+
+                    {/* QR Button */}
+                    <button
+                      onClick={() =>
+                        generateQR(data.status === "paid" ? "exit" : "entrance")
+                      }
+                      style={buttonStyle("primary")}
+                    >
+                      Get QR
                     </button>
-                    
-                    {data.status === "request_booking" && (
-                      <button onClick={() => setShowCancelConfirm(true)} 
-                        className="btn btn-outline-danger rounded-pill px-4 fw-bold w-100 w-md-auto order-2">
-                        <Ban size={18} className="me-1" /> Cancel
+
+                    {/* Cancel Button (normal position for tablet & desktop) */}
+                    {data.status === "request_booking" && !isMobile && (
+                      <button
+                        onClick={() => setShowCancelConfirm(true)}
+                        style={buttonStyle("outline")}
+                      >
+                        Cancel
                       </button>
                     )}
                   </div>
@@ -240,8 +298,8 @@ export default function ParkingCard({ data, dbUser }) {
                 <h5 className="fw-bold mb-3">Cancel Booking?</h5>
                 <p className="text-muted">Are you sure you want to cancel this booking request?</p>
                 <div className="d-flex gap-3 justify-content-center mt-4">
-                  <button className="btn btn-danger rounded-pill px-4 fw-bold" onClick={confirmCancelRequest}>Yes, Cancel</button>
-                  <button className="btn btn-light rounded-pill px-4 fw-bold" onClick={() => setShowCancelConfirm(false)}>No, Keep it</button>
+                  <button className="btn btn-danger rounded-pill px-4 fw-bold w-50" onClick={confirmCancelRequest}>Cancel</button>
+                  <button className="btn btn-light rounded-pill px-4 fw-bold w-50" onClick={() => setShowCancelConfirm(false)}>No</button>
                 </div>
               </div>
             </div>
@@ -279,3 +337,14 @@ export default function ParkingCard({ data, dbUser }) {
     </>
   );
 }
+
+const buttonStyle = (type) => ({
+  width: "100%",
+  padding: "10px 16px",
+  borderRadius: "999px",
+  fontWeight: "bold",
+  cursor: "pointer",
+  border: type === "outline" ? "2px solid #dc3545" : "none",
+  backgroundColor: type === "primary" ? "#0d6efd" : "transparent",
+  color: type === "primary" ? "#fff" : "#dc3545",
+});

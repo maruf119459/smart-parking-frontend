@@ -94,7 +94,7 @@ export default function Register() {
         agreedToTerms: agreed
       });
 
-      toast.success("Registration successful! Please check your email for verification.");
+      toast.success("Registration successful!");
 
       // Navigate to login so they can sign in after verifying
       setTimeout(() => navigate("/login"), 3000);

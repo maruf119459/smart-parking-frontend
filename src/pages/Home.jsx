@@ -3,8 +3,6 @@ import axios from "axios";
 import { useAuth } from "../AuthContext";
 import { socket } from "../socket";
 import { Sun, Moon, Clock, AlertTriangle, CreditCard } from "lucide-react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { BounceLoader } from "react-spinners";
 import loadingImg from "../assets/loading_img.png";
 
@@ -147,7 +145,6 @@ export default function Home() {
                 <title>City Parking | Home</title>
             </Helmet>
             <div className="container py-4" style={{ maxWidth: "900px" }}>
-                <ToastContainer position="top-center" autoClose={3000} />
 
                 {/* Banner Section */}
                 <div className="position-relative text-white rounded-4 overflow-hidden mb-4 shadow-lg"
@@ -163,7 +160,7 @@ export default function Home() {
                     </div>
                     <div className="position-absolute bottom-0 start-0 p-4">
                         <h2 className="mb-0 ">{getGreeting()},</h2>
-                        <h2 className="fw-light">{user ? user.displayName : "Guest"}</h2>
+                        <h2 className="fw-light">{user?.displayName ? user.displayName.split(" ").slice(-1)[0] : "Guest"}</h2>
                     </div>
                     <div className="position-absolute bottom-0 end-0 p-4 text-end">
                         <div className="small opacity-75">{currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>

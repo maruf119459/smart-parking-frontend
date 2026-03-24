@@ -36,7 +36,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar-fixed-top shadow-sm border-bottom bg-white w-100" ref={menuRef}>
-        <div className="container-fluid d-flex justify-content-between align-items-center px-4 py-2">
+        <div className="container-fluid d-flex justify-content-between align-items-center px-3 px-md-4 py-2">
           
           {/* LEFT SIDE: Logo */}
           <div className="navbar-logo">
@@ -72,14 +72,14 @@ export default function Navbar() {
                 </button>
               </>
             ) : (
-              /* Public Links (Login/Signup) */
-              <div className="d-flex align-items-center gap-3">
-                <Link to="/" className="text-decoration-none text-dark d-none d-sm-block">Home</Link>
-                <Link to="/login" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 px-3">
+              /* Public Links (Login/Signup) - Updated for Mobile Visibility */
+              <div className="d-flex align-items-center gap-2 gap-sm-3">
+                <Link to="/" className="text-decoration-none text-dark d-none d-md-block me-2">Home</Link>
+                <Link to="/login" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 px-2 px-sm-3">
                   <LogIn size={16} /> Login
                 </Link>
-                <Link to="/register" className="btn btn-primary btn-sm d-flex align-items-center gap-1 px-3 d-none d-sm-flex">
-                  <UserPlus size={16} /> Sign Up
+                <Link to="/register" className="btn btn-primary btn-sm d-flex align-items-center gap-1 px-2 px-sm-3">
+                  <UserPlus size={16} /> <span className="d-inline">Sign Up</span>
                 </Link>
               </div>
             )}
@@ -122,6 +122,7 @@ export default function Navbar() {
           position: fixed;
           top: 0;
           left: 0;
+          width: 100%;
           z-index: 1050;
           background: white;
         }
@@ -150,6 +151,14 @@ export default function Navbar() {
         .mobile-menu.open {
           max-height: 450px;
           opacity: 1;
+        }
+        /* Extra fix for very small screens to prevent button squishing */
+        @media (max-width: 350px) {
+          .btn-sm {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+            font-size: 12px;
+          }
         }
       `}</style>
     </>

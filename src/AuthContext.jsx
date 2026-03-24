@@ -29,11 +29,9 @@ export function AuthProvider({ children }) {
     if (auth.currentUser) {
       await reload(auth.currentUser);
       setIsVerified(auth.currentUser.emailVerified);
-      if (auth.currentUser.emailVerified) {
-        toast.success("Email verified successfully!");
-      } else {
+      if (!auth.currentUser.emailVerified) {
         toast.info("Email is still not verified.");
-      }
+      } 
     }
   };
 
