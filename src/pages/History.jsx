@@ -70,6 +70,21 @@ export default function History() {
     }
   };
 
+  const clearButton = async ()=>{
+    try {
+      setLoading(true);
+      let url = `${BASE_URL}/api/parking/user-history?uid=${user.uid}`;
+      
+      const res = await axios.get(url);
+      setHistory(res.data);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error("Failed to load history:", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   const toggleDetails = async (parkingId) => {
     if (expandedId === parkingId) {
       setExpandedId(null);
@@ -186,7 +201,7 @@ export default function History() {
           {(startDate || endDate) && (
             <button
               className="btn btn-link btn-sm text-decoration-none p-0 mt-2 text-muted"
-              onClick={() => { setStartDate(""); setEndDate(""); loadHistory(); }}
+              onClick={() => { setStartDate(""); setEndDate(""); clearButton(); }}
             >
               Clear Filters
             </button>

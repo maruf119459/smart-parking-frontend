@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { auth } from "../firebase";
-import { updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
+import { updatePassword, EmailAuthProvider, reauthenticateWithCredential,updateProfile } from "firebase/auth";
 import { toast, ToastContainer } from "react-toastify";
 import logo from "../assets/loading_img.png";
 import { BounceLoader } from "react-spinners";
@@ -74,25 +74,35 @@ export default function Profile() {
     return "Strong Password";
   };
 
-  const handleUpdateProfile = async () => {
-    const updates = {};
-    if (updateNameChecked) updates.name = name;
-    if (updatePhoneChecked) {
-      if (!/^01\d{9}$/.test(phone)) return toast.error("Invalid phone format");
-      updates.phone = phone;
-    }
-    if (Object.keys(updates).length === 0) return toast.warn("Nothing to update");
 
-    try {
-      await axios.patch(`${BASE_URL}/api/users/update-profile`, { uid: user.uid, ...updates });
-      toast.success("Profile updated!");
-      loadData();
-      setUpdateNameChecked(false);
-      setUpdatePhoneChecked(false);
-    } catch (err) {
-      toast.error("Update failed");
+const handleUpdateProfile = async () => {
+  const updates = {};
+  if (updateNameChecked) updates.name = name;
+  
+  if (updatePhoneChecked) {
+    if (!/^01\d{9}$/.test(phone)) return toast.error("Invalid phone format");
+    updates.phone = phone;
+  }
+
+  if (Object.keys(updates).length === 0) return toast.warn("Nothing to update");
+
+  try {
+    if (updateNameChecked && user) {
+      await updateProfile(user, {
+        displayName: name,
+      });
     }
-  };
+
+    await axios.patch(`${BASE_URL}/api/users/update-profile`, { uid: user.uid, ...updates });
+
+    toast.success("Profile updated!");
+    loadData();
+    setUpdateNameChecked(false);
+    setUpdatePhoneChecked(false);
+  } catch (err) {
+    toast.error("Update failed");
+  }
+};
 
   const handleUpdatePassword = async () => {
     if (!oldPassword) return toast.error("Please enter your current password");
@@ -223,7 +233,7 @@ export default function Profile() {
                 {/* Confirm Password */}
                 <div className="position-relative mb-4">
                   <span className="position-absolute start-0 top-50 translate-middle-y ms-3 text-muted"><CheckCircle2 size={18} /></span>
-                  <input type={showConfirmPass ? "text" : "password"} className="form-control form-control-lg border shadow-sm ps-5" placeholder="Confirm New Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                  <input type={showConfirmPass ? "text" : "password"} className="form-control form-control-lg border shadow-sm ps-5" placeholder="Confirm Password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
                   <span className="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" onClick={() => setShowConfirmPass(!showConfirmPass)}>
                     {showConfirmPass ? <EyeOff size={20} /> : <Eye size={20} />}
                   </span>
