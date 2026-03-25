@@ -1,10 +1,23 @@
 
 
-# 🅿️ City Parking - Smart Parking Management System
+# <img src="photoGallery/logo.png" alt="logo" width="120"/> City Parking - Smart Parking Management System
 
 A modern, full-stack solution for urban parking management. This platform allows users to book parking slots, track live parking costs, and manage their vehicle history in real-time.
 
 **🌐 Live Demo:** [https://city-parking.onrender.com/](https://city-parking.onrender.com/)
+
+## 🎉 Happy Announcement
+
+We are excited to announce that our **City Parking App APK is now officially launched! 🚀**
+
+### 📥 Download APK
+👉 [Click here to download the APK](APK/cityParking.apk)
+
+---
+
+### 📸 App Preview
+![App All Screen](photoGallery/appAllScreenPreview.png)
+
 
 ---
 
