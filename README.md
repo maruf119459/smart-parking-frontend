@@ -12,21 +12,30 @@ A modern, full-stack solution for urban parking management. This platform allows
 
 ### 🏠 Home Dashboard
 
-![Home Banner (Logged User)](loggedUserphotoGallery/homePage.png)
-![Home Banner (Guest)](photoGallery/guestHomePage.png)
+Home Page (Guest):
+![Home Page (Guest)](photoGallery/guestHomePage.png)
+Home Page (Logged User):
+![Home Page (Logged User)](photoGallery/loggedUserHomePage.png)
 *The main dashboard featuring real-time weather integration, personalized greetings, and live parking status.*
 
 ### 🛡️ Secure Authentication & Verification
 
+Login Page:
 ![Login Page](photoGallery/loginPage.png)
+Signup Page Step 1:
 ![Signup Page Step 1](photoGallery/signupPage1.png)
+Signup Page Step 2:
 ![Signup Page Step 2](photoGallery/signupPage2.png)
+Forgot Password:
 ![Forgot Password](photoGallery/forgotPassword.png)
 
 ### 📅 Booking, History & Profile
 
+Booking Page:
 ![Booking Page](photoGallery/bookingPage.png)
+History Page:
 ![History Page](photoGallery/historyPage.png)
+Profile Page:
 ![Profile Page](photoGallery/profilePage.png)
 
 ---
