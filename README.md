@@ -1,70 +1,108 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+# 🅿️ City Parking - Smart Parking Management System
 
-In the project directory, you can run:
+A modern, full-stack solution for urban parking management. This platform allows users to book parking slots, track live parking costs, and manage their vehicle history in real-time.
 
-### `npm start`
+**🌐 Live Demo:** [https://city-parking.onrender.com/](https://city-parking.onrender.com/)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 📸 Project Gallery
 
-### `npm test`
+### 🏠 Home Dashboard
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+![Home Banner (Logged User)](loggedUserphotoGallery/homePage.png)
+![Home Banner (Guest)](photoGallery/guestHomePage.png)
+*The main dashboard featuring real-time weather integration, personalized greetings, and live parking status.*
 
-### `npm run build`
+### 🛡️ Secure Authentication & Verification
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+![Login Page](photoGallery/loginPage.png)
+![Signup Page Step 1](photoGallery/signupPage1.png)
+![Signup Page Step 2](photoGallery/signupPage2.png)
+![Forgot Password](photoGallery/forgotPassword.png)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 📅 Booking, History & Profile
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+![Booking Page](photoGallery/bookingPage.png)
+![History Page](photoGallery/historyPage.png)
+![Profile Page](photoGallery/profilePage.png)
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## 🚀 Key Features
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* **🔐 Robust Authentication:** Secure Login/Signup powered by Firebase Auth with a custom Global Email Verification Blocker to ensure only verified users access features.
+* **⏱️ Live Cost Engine:** Real-time calculation of parking charges based on vehicle type (Car, Bike, Truck, etc.) and duration, updated every second via a custom React hook.
+* **📡 Real-time Synchronization:** Integrated with Socket.io to reflect database changes (slot availability/status updates) instantly without page refreshes.
+* **📱 Fully Responsive:** Optimized for mobile, tablet, and desktop with a custom-built responsive Navbar and Bootstrap-powered UI.
+* **☁️ Weather Integration:** Uses Open-Meteo API to provide live weather updates for the parking location.
+* **📜 Rules & Regulations:** Dynamic display of parking guidelines fetched from the backend.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🛠️ Tech Stack
 
-## Learn More
+### Frontend:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* React.js (Hooks, Context API for State Management)
+* React Router Dom (Client-side Routing)
+* Bootstrap 5 (Layout & Responsiveness)
+* Lucide React (Iconography)
+* React Toastify (User Notifications)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### Backend & Database:
 
-### Code Splitting
+* Node.js & Express.js (RESTful API)
+* MongoDB (Database for History & Rates)
+* Firebase Auth (Identity Management)
+* Socket.io (WebSockets for real-time updates)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Deployment:
 
-### Analyzing the Bundle Size
+* Frontend & Backend: Render
+* Database: MongoDB Atlas
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+---
 
-### Making a Progressive Web App
+## 🔧 Installation & Setup
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 1. Clone the repository:
 
-### Advanced Configuration
+```bash
+git clone https://github.com/YOUR_USERNAME/city-parking.git
+cd city-parking
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### 2. Install dependencies:
 
-### Deployment
+```bash
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 3. Create .env file:
 
-### `npm run build` fails to minify
+```bash
+echo REACT_APP_FIREBASE_API_KEY=your_api_key > .env
+echo REACT_APP_FIREBASE_AUTH_DOMAIN=your_auth_domain >> .env
+echo REACT_APP_BACKEND_URL=your_backend_url >> .env
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 4. Run the app:
+
+```bash
+npm start
+```
+
+---
+
+## 🛡️ License
+
+Distributed under the MIT License. See LICENSE for more information.
+
+---
+
+## 👨‍💻 Developers
+
+Developed with ❤️ by  [Md. Mohiuddin Maruf](https://github.com/maruf119459)  [Abrarul Haque](https://github.com/Abrarul-Haque1303) 
