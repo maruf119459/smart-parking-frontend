@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { socket } from "../socket";
+import socket  from "../socket";
 import ParkingCard from "../components/ParkingCard";
 import { useAuth } from "../AuthContext";
 import { toast, ToastContainer } from "react-toastify";
