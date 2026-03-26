@@ -127,4 +127,4 @@ Distributed under the MIT License. See LICENSE for more information.
 
 ## 👨‍💻 Developers
 
-Developed with ❤️ by  [Md. Mohiuddin Maruf](https://github.com/maruf119459)  [Abrarul Haque](https://github.com/Abrarul-Haque1303) 
+Developed with ❤️ by  [Md. Mohiuddin Maruf](https://github.com/maruf119459) & [Abrarul Haque](https://github.com/Abrarul-Haque1303) 
