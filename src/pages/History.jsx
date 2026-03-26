@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { socket } from "../socket";
+import socket  from "../socket";
 import { useAuth } from "../AuthContext";
 import { BounceLoader } from "react-spinners";
 import loadingImg from "../assets/loading_img.png";

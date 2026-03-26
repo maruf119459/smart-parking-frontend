@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAuth } from "../AuthContext";
-import { socket } from "../socket";
+import socket  from "../socket";
 import { Sun, Moon, Clock, AlertTriangle, CreditCard } from "lucide-react";
 import { BounceLoader } from "react-spinners";
 import loadingImg from "../assets/loading_img.png";
