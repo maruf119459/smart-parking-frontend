@@ -93,8 +93,8 @@ Profile Page:
 ### 1. Clone the repository:
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/city-parking.git
-cd city-parking
+git clone https://github.com/maruf119459/smart-parking-frontend.git
+cd smart-parking-frontend
 ```
 
 ### 2. Install dependencies:
