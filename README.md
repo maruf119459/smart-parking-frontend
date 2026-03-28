@@ -119,6 +119,32 @@ npm start
 
 ---
 
+## 🗂️ Other Repositories
+
+**👉 Admin Frontend Github**
+  [Click Here](https://github.com/maruf119459/smart-parking-admin-frontend.git)
+
+**👉 Backend Github**
+  [Click Here](https://github.com/maruf119459/smart-parking-backend.git)
+
+---
+
+## 🔗 Other Important Links
+
+**👉 User Frontend Live Link**
+  [Click Here](https://city-parking.onrender.com)
+
+**👉 User APK**
+  [Click Here](https://github.com/maruf119459/smart-parking-frontend/releases/download/v1.0.0/cityParking.apk)
+
+**👉 Admin Frontend Link**
+  [Click Here](https://city-parking-admin.onrender.com)
+
+**👉 Admin Desktop Application .exe**
+  [Click Here](https://github.com/maruf119459/smart-parking-admin-frontend/releases/download/v1.0.0/City_Parking_Admin_Setup_0.1.0.exe)
+
+---
+
 ## 🛡️ License
 
 Distributed under the MIT License. See LICENSE for more information.
