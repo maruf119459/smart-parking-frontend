@@ -43,5 +43,5 @@ export default function App() {
 }
 
 /* https://smart-parking-backend-u47b.onrender.com - production backend (https:// smart-parking-backend-u47b.onrender.com)
-   http://localhost:5000 - local backend
+   https://smart-parking-backend-u47b.onrender.com - local backend
 */

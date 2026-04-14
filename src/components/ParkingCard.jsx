@@ -1,16 +1,12 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { auth } from "../firebase";
-import { QrCode, CreditCard, Clock, AlertTriangle, Calendar, Ban } from "lucide-react";
+import { Key, CreditCard, Clock, AlertTriangle, Calendar, Hash } from "lucide-react"; // Changed QrCode to Key and Hash
 import { toast } from "react-toastify";
-import { BounceLoader } from "react-spinners";
-import loadingImg from "../assets/loading_img.png";
 
 export default function ParkingCard({ data, dbUser }) {
-  const [qr, setQr] = useState(null);
-  const [qrLoading, setQrLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [showCancelConfirm, setShowCancelConfirm] = useState(false); // New state for cancel modal
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [liveCost, setLiveCost] = useState("0.00");
   const [liveDuration, setLiveDuration] = useState(0);
   const [rate, setRate] = useState(0);
@@ -23,10 +19,7 @@ export default function ParkingCard({ data, dbUser }) {
   const [currentCharge, setCurrentCharge] = useState(0);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
-
   const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
-
-
   const user = auth.currentUser;
 
   useEffect(() => {
@@ -101,19 +94,6 @@ export default function ParkingCard({ data, dbUser }) {
     } catch (err) { toast.error("Failed to cancel request."); }
   };
 
-  const generateQR = async (type) => {
-    setQrLoading(true);
-    setShowModal(true);
-    try {
-      const url = type === 'entrance' ? `${BASE_URL}/api/qr/entrance` : `${BASE_URL}/api/qr/exit`;
-      const res = await axios.post(url, type === 'entrance' ? data : { parkingId: data._id });
-      setQr(res.data.qr);
-    } catch (err) {
-      toast.error("QR Generation failed");
-      setShowModal(false);
-    } finally { setQrLoading(false); }
-  };
-
   const handlePayment = async () => {
     const finalAmount = data.status === "repay" ? totalRepayFee : liveCost;
     try {
@@ -141,12 +121,10 @@ export default function ParkingCard({ data, dbUser }) {
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
 
-  // 🎯 Conditions
   const isMobile = screenWidth <= 450;
   const isTablet = screenWidth > 450 && screenWidth < 768;
   const isDesktop = screenWidth >= 768;
 
-  // 🎯 Layout logic
   let flexDirection = "row";
   let justifyContent = "flex-start";
   let alignItems = "center";
@@ -187,9 +165,10 @@ export default function ParkingCard({ data, dbUser }) {
                   <div className="mt-2 p-2 rounded">
                     <div><Clock size={14} /> <b>Booking:</b> {new Date(data.booking_time).toLocaleString()}</div>
                     <div><Calendar size={14} /> <b>Est. Entry Deadline:</b> {new Date(new Date(data.booking_time).getTime() + 10 * 60000).toLocaleTimeString()}</div>
-                    <div className="text-danger mt-1"><AlertTriangle size={12} /> Entry within 10 mins or cancellation.</div>
+                    <div className="text-danger mt-1"><AlertTriangle size={12} /> Use 5-digit Key at Gate.</div>
                   </div>
                 )}
+                {/* ... other status checks (parked, paid, repay) stay the same ... */}
                 {data.status === 'parked' && (
                   <>
                     <div><Clock size={14} /> <b>Entry:</b> {new Date(data.entryTime).toLocaleString()}</div>
@@ -199,17 +178,16 @@ export default function ParkingCard({ data, dbUser }) {
                 {data.status === 'paid' && (
                   <>
                     <div><Clock size={14} /> <b>Entry:</b> {new Date(data.entryTime).toLocaleString()}</div>
-                    <div className="text-danger mt-1"><AlertTriangle size={12} /> <b>Note:</b> Fail to enter within 10 mins will result in fine will be applicable.</div>
-                    <div><CreditCard size={14} /> <b>{paymentHistory.length > 1 ? "Repaid At:" : "Paid At:"}</b> {new Date(data.paidAt).toLocaleString()}</div>
+                    <div className="text-danger mt-1"><AlertTriangle size={12} /> <b>Note:</b> Exit within 10 mins or fine applies.</div>
+                    <div><CreditCard size={14} /> <b>Paid At:</b> {new Date(data.paidAt).toLocaleString()}</div>
                     <div className="text-primary fw-bold mt-1"><Clock size={14} /> <b>Exit Deadline:</b> {new Date(new Date(data.paidAt).getTime() + 10 * 60000).toLocaleTimeString()}</div>
                   </>
                 )}
                 {data.status === "repay" && (
                   <div className="mt-2">
                     <div><b>Entry:</b> {new Date(data.entryTime).toLocaleString()}</div>
-                    <div><b>Last Exit Deadline:</b> {new Date(new Date(paymentHistory[paymentHistory.length - 1]?.paidAt || Date.now()).getTime() + 10 * 60000).toLocaleTimeString()}</div>
                     <div className="text-danger fw-bold">Outstanding Time: {formatTime(additionalMinutes)}</div>
-                    <div className="text-danger fw-bold">Fine: ৳{fineAmount} | Current Charge : ৳{currentCharge}</div>
+                    <div className="text-danger fw-bold">Fine: ৳{fineAmount} | Charge: ৳{currentCharge}</div>
                   </div>
                 )}
               </div>
@@ -230,45 +208,20 @@ export default function ParkingCard({ data, dbUser }) {
                 <div className="d-flex flex-column align-items-start align-items-md-end gap-2">
                   <div className="small fw-bold text-danger animate-pulse">Timer: {formatTimer(timeLeft)}</div>
 
-                  {/* Flex container that changes behavior based on screen size */}
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection,
-                      gap: "8px",
-                      width: "100%",
-                      justifyContent,
-                      alignItems,
-                    }}
-                  >
-                    {/* Cancel Button (conditionally placed first for mobile) */}
+                  <div style={{ display: "flex", flexDirection, gap: "8px", width: "100%", justifyContent, alignItems }}>
                     {data.status === "request_booking" && isMobile && (
-                      <button
-                        onClick={() => setShowCancelConfirm(true)}
-                        style={buttonStyle("outline")}
-                      >
-                        Cancel
-                      </button>
+                      <button onClick={() => setShowCancelConfirm(true)} style={buttonStyle("outline")}>Cancel</button>
                     )}
 
-                    {/* QR Button */}
                     <button
-                      onClick={() =>
-                        generateQR(data.status === "paid" ? "exit" : "entrance")
-                      }
+                      onClick={() => setShowModal(true)}
                       style={buttonStyle("primary")}
                     >
-                      Get QR
+                      <Key size={18} className="me-2" /> Get Key
                     </button>
 
-                    {/* Cancel Button (normal position for tablet & desktop) */}
                     {data.status === "request_booking" && !isMobile && (
-                      <button
-                        onClick={() => setShowCancelConfirm(true)}
-                        style={buttonStyle("outline")}
-                      >
-                        Cancel
-                      </button>
+                      <button onClick={() => setShowCancelConfirm(true)} style={buttonStyle("outline")}>Cancel</button>
                     )}
                   </div>
                 </div>
@@ -288,7 +241,7 @@ export default function ParkingCard({ data, dbUser }) {
         </div>
       </div>
 
-      {/* CANCELLATION CONFIRMATION MODAL */}
+      {/* CANCELLATION MODAL (Same as before) */}
       {showCancelConfirm && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered">
@@ -307,28 +260,29 @@ export default function ParkingCard({ data, dbUser }) {
         </div>
       )}
 
-      {/* QR MODAL */}
+      {/* KEY MODAL (Replaced QR Code) */}
       {showModal && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(5px)', zIndex: 1060 }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 rounded-4 shadow-lg">
               <div className="modal-header border-0 bg-light rounded-top-4">
-                <h5 className="modal-title fw-bold">Scan at Gate</h5>
+                <h5 className="modal-title fw-bold">Entrance Key</h5>
                 <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
               </div>
               <div className="modal-body text-center py-5">
-                {qrLoading ? (
-                  <div className="py-4">
-                    <img src={loadingImg} alt="Logo" className="mb-3" style={{ width: "150px" }} />
-                    <BounceLoader className="mx-auto" color="#6199ff" size={40} />
-                    <p className="mt-3 text-muted fw-bold">Generating Secure QR...</p>
-                  </div>
-                ) : (
-                  <>
-                    <img src={qr} alt="QR" className="img-fluid rounded-3 shadow-sm border p-3 bg-white" style={{ width: "240px" }} />
-                    <p className="mt-4 text-muted small px-3">This QR is valid for 10 minutes.</p>
-                  </>
-                )}
+                <div className="mb-4">
+                    <div className="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style={{width: '60px', height: '60px'}}>
+                        <Hash size={30} />
+                    </div>
+                    <p className="text-muted mb-1">Enter this code at the gate terminal:</p>
+                    <h1 className="display-3 fw-bold tracking-widest text-dark" style={{ letterSpacing: '8px' }}>
+                        {data.oneTimeKey || "00000"}
+                    </h1>
+                </div>
+                <div className="alert alert-warning mx-3 mb-0 border-0 rounded-3">
+                    <Clock size={16} className="me-2" />
+                    <span className="small fw-bold">Expires in: {formatTimer(timeLeft)}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -339,6 +293,9 @@ export default function ParkingCard({ data, dbUser }) {
 }
 
 const buttonStyle = (type) => ({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   width: "100%",
   padding: "10px 16px",
   borderRadius: "999px",
@@ -347,4 +304,5 @@ const buttonStyle = (type) => ({
   border: type === "outline" ? "2px solid #dc3545" : "none",
   backgroundColor: type === "primary" ? "#0d6efd" : "transparent",
   color: type === "primary" ? "#fff" : "#dc3545",
+  transition: "all 0.2s ease"
 });
