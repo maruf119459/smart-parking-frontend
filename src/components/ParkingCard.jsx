@@ -172,7 +172,7 @@ export default function ParkingCard({ data, dbUser }) {
                 {data.status === 'parked' && (
                   <>
                     <div><Clock size={14} /> <b>Entry:</b> {new Date(data.entryTime).toLocaleString()}</div>
-                    <div><AlertTriangle size={14} /> <b>Rate:</b> {data.parkingRate}</div>
+                    <div><AlertTriangle size={14} /> <b>Rate:</b> {rate} BDT / Per Minute</div>
                   </>
                 )}
                 {data.status === 'paid' && (
@@ -241,7 +241,7 @@ export default function ParkingCard({ data, dbUser }) {
         </div>
       </div>
 
-      {/* CANCELLATION MODAL (Same as before) */}
+      {/* CANCELLATION MODAL*/}
       {showCancelConfirm && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050 }}>
           <div className="modal-dialog modal-dialog-centered">
@@ -260,13 +260,13 @@ export default function ParkingCard({ data, dbUser }) {
         </div>
       )}
 
-      {/* KEY MODAL (Replaced QR Code) */}
+      {/* KEY MODAL*/}
       {showModal && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(5px)', zIndex: 1060 }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 rounded-4 shadow-lg">
               <div className="modal-header border-0 bg-light rounded-top-4">
-                <h5 className="modal-title fw-bold">Entrance Key</h5>
+                <h5 className="modal-title fw-bold">Key</h5>
                 <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
               </div>
               <div className="modal-body text-center py-5">
