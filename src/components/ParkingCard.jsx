@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import { auth } from "../firebase";
-import { Key, CreditCard, Clock, AlertTriangle, Calendar, Hash } from "lucide-react"; // Changed QrCode to Key and Hash
+import { QrCode, CreditCard, Clock, AlertTriangle, Calendar } from "lucide-react"; 
 import { toast } from "react-toastify";
 
 export default function ParkingCard({ data, dbUser }) {
@@ -12,6 +12,10 @@ export default function ParkingCard({ data, dbUser }) {
   const [rate, setRate] = useState(0);
   const [timeLeft, setTimeLeft] = useState(null);
   const [paymentHistory, setPaymentHistory] = useState([]);
+  
+  // New state for QR Code
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [loadingQr, setLoadingQr] = useState(false);
 
   const [fineAmount, setFineAmount] = useState(100);
   const [additionalMinutes, setAdditionalMinutes] = useState(0);
@@ -27,6 +31,22 @@ export default function ParkingCard({ data, dbUser }) {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Fetch QR Code when modal opens
+  useEffect(() => {
+    if (showModal && data.oneTimeKey) {
+      setLoadingQr(true);
+      axios.post(`${BASE_URL}/api/qr/generate`, { key: data.oneTimeKey })
+        .then(res => {
+          setQrCodeUrl(res.data.qr);
+          setLoadingQr(false);
+        })
+        .catch(err => {
+          console.error("QR Generation Error:", err);
+          setLoadingQr(false);
+        });
+    }
+  }, [showModal, data.oneTimeKey]);
 
   useEffect(() => {
     if (!data?.vehicleType) return;
@@ -165,10 +185,9 @@ export default function ParkingCard({ data, dbUser }) {
                   <div className="mt-2 p-2 rounded">
                     <div><Clock size={14} /> <b>Booking:</b> {new Date(data.booking_time).toLocaleString()}</div>
                     <div><Calendar size={14} /> <b>Est. Entry Deadline:</b> {new Date(new Date(data.booking_time).getTime() + 10 * 60000).toLocaleTimeString()}</div>
-                    <div className="text-danger mt-1"><AlertTriangle size={12} /> Use 5-digit Key at Gate.</div>
+                    <div className="text-danger mt-1"><AlertTriangle size={12} /> Scan QR code at Gate.</div>
                   </div>
                 )}
-                {/* ... other status checks (parked, paid, repay) stay the same ... */}
                 {data.status === 'parked' && (
                   <>
                     <div><Clock size={14} /> <b>Entry:</b> {new Date(data.entryTime).toLocaleString()}</div>
@@ -217,7 +236,7 @@ export default function ParkingCard({ data, dbUser }) {
                       onClick={() => setShowModal(true)}
                       style={buttonStyle("primary")}
                     >
-                      <Key size={18} className="me-2" /> Get Key
+                      <QrCode size={18} className="me-2" /> Get QR
                     </button>
 
                     {data.status === "request_booking" && !isMobile && (
@@ -260,28 +279,30 @@ export default function ParkingCard({ data, dbUser }) {
         </div>
       )}
 
-      {/* KEY MODAL*/}
+      {/* QR CODE MODAL*/}
       {showModal && (
         <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(5px)', zIndex: 1060 }}>
           <div className="modal-dialog modal-dialog-centered">
             <div className="modal-content border-0 rounded-4 shadow-lg">
               <div className="modal-header border-0 bg-light rounded-top-4">
-                <h5 className="modal-title fw-bold">Key</h5>
-                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+                <h5 className="modal-title fw-bold">Entrance QR Code</h5>
+                <button type="button" className="btn-close" onClick={() => {setShowModal(false); setQrCodeUrl("");}}></button>
               </div>
-              <div className="modal-body text-center py-5">
-                <div className="mb-4">
-                    <div className="d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary rounded-circle mb-3" style={{width: '60px', height: '60px'}}>
-                        <Hash size={30} />
-                    </div>
-                    <p className="text-muted mb-1">Enter this code at the gate terminal:</p>
-                    <h1 className="display-3 fw-bold tracking-widest text-dark" style={{ letterSpacing: '8px' }}>
-                        {data.oneTimeKey || "00000"}
-                    </h1>
+              <div className="modal-body text-center py-4">
+                <div className="mb-3">
+                    <p className="text-muted mb-3">Scan this code at the gate terminal to enter:</p>
+                    
+                    <div className="d-flex justify-content-center align-items-center bg-white p-3 rounded-4 shadow-sm mx-auto" style={{width: '220px', height: '220px', border: '1px solid #eee'}}>
+                      {loadingQr ? (
+                        <div className="spinner-border text-primary" role="status"></div>
+                      ) : (
+                        qrCodeUrl && <img src={qrCodeUrl} alt="Parking QR Code" style={{ width: '100%', height: '100%' }} />
+                      )}
+                    </div>                    
                 </div>
                 <div className="alert alert-warning mx-3 mb-0 border-0 rounded-3">
                     <Clock size={16} className="me-2" />
-                    <span className="small fw-bold">Expires in: {formatTimer(timeLeft)}</span>
+                    <span className="small fw-bold">Valid for: {formatTimer(timeLeft)}</span>
                 </div>
               </div>
             </div>

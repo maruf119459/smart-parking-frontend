@@ -15,6 +15,7 @@ import Home from "./pages/Home";
 
 // Import your CSS file where you will put the styles below
 import "./App.css"; 
+import QRDecode from "./pages/QRDecode";
 
 export default function App() {
   return (
@@ -29,6 +30,8 @@ export default function App() {
             <Routes>
               <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
               <Route path="/forgot-password" element={<PublicRoute><ForgotPassword /></PublicRoute>} />
+              <Route path="/qrcodedecode" element={<PublicRoute><QRDecode /></PublicRoute>} />
+
               <Route path="/" element={<Home />} />
               <Route path="/history" element={<PrivateRoute><History /></PrivateRoute>} />
               <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />

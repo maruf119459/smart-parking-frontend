@@ -4,7 +4,7 @@ import { useAuth } from "../AuthContext"; // Adjusted path to your context
 import { 
   Menu, X, LogOut, Home, 
   CalendarCheck, History, User, 
-  LogIn, UserPlus 
+  LogIn, UserPlus, QrCode
 } from "lucide-react";
 import logo from "../assets/loading_img.png";
 
@@ -77,6 +77,9 @@ export default function Navbar() {
                 <Link to="/" className="text-decoration-none text-dark d-none d-md-block me-2">Home</Link>
                 <Link to="/login" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 px-2 px-sm-3">
                   <LogIn size={16} /> Login
+                </Link>
+                <Link to="/qrcodedecode" className="btn btn-outline-primary btn-sm d-flex align-items-center gap-1 px-2 px-sm-3">
+                  <QrCode size={16} /> QR Decode
                 </Link>
                 <Link to="/register" className="btn btn-primary btn-sm d-flex align-items-center gap-1 px-2 px-sm-3">
                   <UserPlus size={16} /> <span className="d-inline">Sign Up</span>
