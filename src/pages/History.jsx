@@ -48,7 +48,7 @@ export default function History() {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+  const BASE_URL = "https://city-parking-backend.onrender.com";
 
 
   const loadHistory = async () => {

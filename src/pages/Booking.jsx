@@ -19,7 +19,7 @@ export default function Booking() {
   const [loading, setLoading] = useState(true);
   const [bookingLoad, setBookingLoad] = useState(false);
   const [dbUser, setDbUser] = useState(null);
-  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+  const BASE_URL = "https://city-parking-backend.onrender.com";
 
   const loadData = async () => {
     try {

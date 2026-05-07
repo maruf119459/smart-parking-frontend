@@ -19,7 +19,7 @@ export default function ParkingCard({ data, dbUser }) {
   const [currentCharge, setCurrentCharge] = useState(0);
   const [screenWidth, setScreenWidth] = useState(window.innerWidth);
 
-  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+  const BASE_URL = "https://city-parking-backend.onrender.com";
   const user = auth.currentUser;
 
   useEffect(() => {

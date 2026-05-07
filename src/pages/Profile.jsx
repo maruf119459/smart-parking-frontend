@@ -32,7 +32,7 @@ export default function Profile() {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [passStrength, setPassStrength] = useState(0);
 
-  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+  const BASE_URL = "https://city-parking-backend.onrender.com";
 
   useEffect(() => {
     if (user) loadData();

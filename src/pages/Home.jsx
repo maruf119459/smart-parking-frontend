@@ -51,7 +51,7 @@ export default function Home() {
     const [loading, setLoading] = useState(true);
     const [isDay, setIsDay] = useState(true);
 
-    const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+    const BASE_URL = "https://city-parking-backend.onrender.com";
 
 
     // Initial Data Fetch

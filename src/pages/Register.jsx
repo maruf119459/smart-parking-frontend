@@ -28,7 +28,7 @@ export default function Register() {
   const [terms, setTerms] = useState([]);
   const { password } = formData;
 
-  const BASE_URL = "https://smart-parking-backend-u47b.onrender.com";
+  const BASE_URL = "https://city-parking-backend.onrender.com";
 
 
   const navigate = useNavigate();
